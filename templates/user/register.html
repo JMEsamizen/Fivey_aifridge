@@ -1,0 +1,172 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fivey - Register</title>
+
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+</head>
+
+
+<body>
+
+
+    <div class="auth-container">
+
+
+        <div class="auth-card register-card">
+
+
+            <div class="logo">
+                🍏
+            </div>
+
+
+            <h1>
+                Create Account
+            </h1>
+
+
+            <p class="subtitle">
+                Join Fivey and make your lifestyle smarter
+            </p>
+
+
+
+            {% if error %}
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+
+            <form action="{% url 'register' %}" method="post">
+
+                {% csrf_token %}
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Name
+                    </label>
+
+                    <input type="text" name="name" placeholder="Enter your name" required>
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Surname
+                    </label>
+
+                    <input type="text" name="surname" placeholder="Enter your surname">
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Birth date
+                    </label>
+
+                    <input type="date" name="birth-date">
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Username
+                    </label>
+
+                    <input type="text" name="username" placeholder="Create username" required>
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input type="email" name="email" placeholder="Enter your email" required>
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input type="password" name="password" placeholder="Create password" required>
+
+                </div>
+
+
+
+                <div class="input-group">
+
+                    <label>
+                        Confirm Password
+                    </label>
+
+                    <input type="password" name="re-password" placeholder="Repeat password" required>
+
+                </div>
+
+
+
+                <button type="submit">
+                    Create Account 🚀
+                </button>
+
+
+            </form>
+
+
+
+            <p class="register-text">
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+
+            </p>
+
+
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

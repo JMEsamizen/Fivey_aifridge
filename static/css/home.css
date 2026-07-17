@@ -1,0 +1,168 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+
+    background:linear-gradient(135deg,#eef6ff,#f6fff5);
+
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding:40px;
+}
+
+.container{
+
+    width:1100px;
+    max-width:100%;
+
+    background:white;
+
+    border-radius:25px;
+
+    padding:45px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.1);
+}
+
+.top-buttons{
+
+    display:flex;
+    justify-content:flex-end;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.top-buttons a{
+
+    text-decoration:none;
+}
+
+.top-buttons button{
+
+    border:none;
+    padding:12px 24px;
+    border-radius:12px;
+    background:#4a90e2;
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    transition:.3s;
+}
+
+.top-buttons button:hover{
+
+    background:#2f6db9;
+}
+
+h1{
+
+    text-align:center;
+    color:#1d3557;
+    margin-bottom:10px;
+}
+
+.subtitle{
+
+    text-align:center;
+    color:#666;
+    margin-bottom:45px;
+}
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+
+    gap:25px;
+}
+
+.card{
+
+    text-decoration:none;
+
+    color:#333;
+
+    background:#fafafa;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    text-align:center;
+
+    transition:.3s;
+
+    border:2px solid transparent;
+}
+
+.card:hover{
+
+    transform:translateY(-8px);
+
+    border-color:#4a90e2;
+
+    box-shadow:0 12px 25px rgba(0,0,0,.1);
+}
+
+.emoji{
+
+    font-size:55px;
+
+    margin-bottom:15px;
+}
+
+.card h2{
+
+    margin-bottom:12px;
+
+    color:#1d3557;
+}
+
+.card p{
+
+    color:#777;
+
+    line-height:1.6;
+}
+
+@media(max-width:700px){
+
+    .top-buttons{
+
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+
+    .container{
+
+        padding:25px;
+    }
+
+}
+
+.top-buttons form{
+    display:inline;
+}
+
+.welcome-user{
+
+    padding:12px 20px;
+
+    background:#f1f5f9;
+
+    border-radius:12px;
+
+    color:#1d3557;
+
+    font-weight:bold;
+
+}

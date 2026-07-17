@@ -1,11 +1,79 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart-Fridge</title>
+    <title>Smart Fridge AI</title>
+
+    <link rel="stylesheet" href="{% static 'css/smartfr.css' %}">
 </head>
+
 <body>
-    <h1>Welcome to the Smart-Fridge Page!</h1>
+
+    <div class="container">
+        {% if new_user %}
+        <div class="empty-fridge">
+            <h1>🧊 Smart Fridge</h1>
+            <p>
+                Your fridge is empty.<br>
+                Upload a photo and AI will recognize your products.
+            </p>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label class="upload-box">
+                    <input id="fileInput" type="file" name="file" accept="image/*,video/*" required>
+                    <span id="fileName">
+                        📷 Choose fridge image
+                    </span>
+                </label>
+                <button type="submit">
+                    🤖 Scan Fridge
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="fridge-dashboard">
+            <div class="header">
+                <h1>
+                    🧊 My Fridge
+                </h1>
+                <p>
+                    Updated:
+                    {{ fridge.updated_at }}
+                </p>
+            </div>
+            <div class="products-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <span>
+                        🍽️
+                    </span>
+                    {{ product.name }}
+                </div>
+                {% empty %}
+                <p>
+                    Your fridge is empty.
+                </p>
+                {% endfor %}
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label class="upload-box">
+                    <input id="fileInput" type="file" name="file" accept="image/*">
+                    <span id="fileName">
+                        📷 Scan again
+                    </span>
+                </label>
+                <button type="submit">
+                    🔄 Update Fridge
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    <script src="{% static 'js/smartfr.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,220 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+
+body{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:linear-gradient(
+        135deg,
+        #eef6ff,
+        #f3fff5
+    );
+
+    padding:40px 20px;
+
+}
+
+
+/* Main registration card */
+
+form{
+
+    width:450px;
+
+    background:white;
+
+    padding:40px;
+
+    border-radius:25px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.12);
+
+}
+
+
+/* Labels */
+
+label{
+
+    display:block;
+
+    color:#1d3557;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    margin-bottom:8px;
+
+    margin-top:18px;
+
+}
+
+
+/* Inputs */
+
+input{
+
+    width:100%;
+
+    height:48px;
+
+    padding:0 15px;
+
+    border-radius:12px;
+
+    border:1px solid #ddd;
+
+    outline:none;
+
+    font-size:15px;
+
+    background:#fafafa;
+
+    transition:.3s;
+
+}
+
+
+input:focus{
+
+    background:white;
+
+    border-color:#4a90e2;
+
+    box-shadow:
+        0 0 0 3px rgba(74,144,226,.15);
+
+}
+
+
+/* Placeholder */
+
+input::placeholder{
+
+    color:#999;
+
+}
+
+
+/* Date input */
+
+input[type="date"]{
+
+    color:#555;
+
+}
+
+
+/* Button */
+
+button{
+
+    width:100%;
+
+    height:52px;
+
+    margin-top:30px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#4a90e2;
+
+    color:white;
+
+    font-size:17px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+button:hover{
+
+    background:#2d6fc2;
+
+    transform:translateY(-2px);
+
+}
+
+
+button:active{
+
+    transform:scale(.98);
+
+}
+
+
+/* Add a title using form before */
+
+form::before{
+
+    content:"🍏 Create your Fivey account";
+
+    display:block;
+
+    text-align:center;
+
+    font-size:25px;
+
+    font-weight:bold;
+
+    color:#1d3557;
+
+    margin-bottom:10px;
+
+}
+
+
+/* Subtitle */
+
+form::after{
+
+    content:"Start your AI-powered healthy lifestyle";
+
+    display:block;
+
+    text-align:center;
+
+    color:#777;
+
+    font-size:14px;
+
+    margin-bottom:25px;
+
+}
+
+
+/* Mobile responsive */
+
+@media(max-width:500px){
+
+    form{
+
+        width:100%;
+
+        padding:30px 25px;
+
+    }
+
+
+}

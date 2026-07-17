@@ -1,0 +1,128 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fivey - Login</title>
+
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+
+</head>
+
+
+<body>
+
+
+<div class="auth-container">
+
+
+    <div class="auth-card">
+
+
+        <div class="logo">
+            🍏
+        </div>
+
+
+        <h1>
+            Welcome Back!
+        </h1>
+
+
+        <p class="subtitle">
+            Login to continue using Fivey
+        </p>
+
+
+
+        {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+
+        {% if message %}
+
+        <div class="success">
+            {{ message }}
+        </div>
+
+        {% endif %}
+
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="input-group">
+
+                <label>
+                    Username
+                </label>
+
+                <input 
+                    type="text"
+                    name="username"
+                    placeholder="Enter username"
+                    required>
+
+            </div>
+
+
+
+            <div class="input-group">
+
+                <label>
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Enter password"
+                    required>
+
+            </div>
+
+
+
+            <button type="submit">
+                Login 🚀
+            </button>
+
+
+        </form>
+
+
+
+        <p class="register-text">
+
+            Don't have an account?
+
+            <a href="{% url 'register' %}">
+                Create one
+            </a>
+
+        </p>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
