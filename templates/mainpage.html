@@ -1,98 +1,160 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fivey</title>
+    <title>Fivey - Smart Food Intelligence</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 
 <body>
-    <div class="container">
-        <div class="top-buttons">
-            {% if user.is_authenticated %}
-            <div class="welcome-user">
-                👋 Hello, {{ user.username }}
-            </div>
-            <form action="{% url 'logout' %}" method="post">
-                {% csrf_token %}
-                <button type="submit">
-                    Log Out
-                </button>
-            </form>
-            {% else %}
-            <a href="{% url 'register' %}">
-                <button>
-                    Register
-                </button>
-            </a>
-            <a href="{% url 'login' %}">
-                <button>
-                    Log In
-                </button>
-            </a>
-            {% endif %}
-        </div>
-        {% if user.is_authenticated %}
-        <h1>
-            🍏 Welcome back, {{ user.first_name|default:user.username }}!
-        </h1>
-        {% else %}
-        <h1>
-            🍏 Welcome to Fivey!
-        </h1>
-        {% endif %}
-        <p class="subtitle">
-            Your AI-powered healthy lifestyle assistant
-        </p>
-        <div class="cards">
-            <a href="{% url 'smart-fridge' %}" class="card">
-                <div class="emoji">
-                    🧊
-                </div>
-                <h2>
-                    Smart Fridge
-                </h2>
-                <p>
-                    Detect products inside your refrigerator using AI.
-                </p>
-            </a>
-            <a href="{% url 'markets' %}" class="card">
-                <div class="emoji">
-                    🛒
-                </div>
-                <h2>
-                    Markets
-                </h2>
-                <p>
-                    Find nearby supermarkets and grocery stores.
-                </p>
-            </a>
-            <a href="{% url 'recipies' %}" class="card">
-                <div class="emoji">
-                    🍳
-                </div>
-                <h2>
-                    Recipes
-                </h2>
-                <p>
-                    Generate meals from your ingredients.
-                </p>
-            </a>
-            <a href="{% url 'my-health' %}" class="card">
-                <div class="emoji">
-                    ❤️
-                </div>
-                <h2>
-                    My Health
-                </h2>
-                <p>
-                    Track nutrition and improve your lifestyle.
-                </p>
-            </a>
-        </div>
+
+<header class="navbar">
+    <div class="logo">
+        Fivey
     </div>
+
+    <div class="nav-actions">
+        {% if user.is_authenticated %}
+
+        <span>
+            {{ user.username }}
+        </span>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button class="logout-btn">
+                Logout
+            </button>
+        </form>
+
+        {% else %}
+
+        <a href="{% url 'login' %}">
+            Login
+        </a>
+
+        <a class="nav-signup" href="{% url 'register' %}">
+            Sign Up
+        </a>
+
+        {% endif %}
+    </div>
+</header>
+
+<main>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Your food.
+            <br>
+            Smarter with AI.
+        </h1>
+
+        <p>
+            Fivey transforms your fridge into an intelligent
+            food assistant. Scan products, reduce waste,
+            and get personalized recommendations.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{% url 'register' %}" class="primary-btn">
+                Get Started
+            </a>
+
+            <a href="{% url 'smart-fridge' %}" class="create-btn">
+                Create Fridge
+            </a>
+
+        </div>
+
+        <div class="trust">
+            Trusted AI-powered food management
+        </div>
+
+    </div>
+
+
+    <div class="hero-card">
+
+        <div class="fridge-preview">
+
+            <div class="preview-header">
+                Smart Fridge
+            </div>
+
+            <div class="product">
+                Milk
+                <span>Fresh</span>
+            </div>
+
+            <div class="product">
+                Vegetables
+                <span>Healthy</span>
+            </div>
+
+            <div class="product">
+                Eggs
+                <span>Available</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="features">
+
+    <div class="feature">
+
+        <h3>
+            AI Recognition
+        </h3>
+
+        <p>
+            Identify products instantly from images.
+        </p>
+
+    </div>
+
+
+    <div class="feature">
+
+        <h3>
+            Smart Recipes
+        </h3>
+
+        <p>
+            Generate meals using your ingredients.
+        </p>
+
+    </div>
+
+
+    <div class="feature">
+
+        <h3>
+            Health Insights
+        </h3>
+
+        <p>
+            Understand your nutrition better.
+        </p>
+
+    </div>
+
+</section>
+
+</main>
+
+<script src="{% static 'js/home.js' %}"></script>
+
 </body>
 </html>

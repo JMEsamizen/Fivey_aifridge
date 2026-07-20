@@ -143,7 +143,6 @@ class RegisterView(View):
         )
 
         login(request, user)
-
         return redirect("mainpage")
 
 class LoginView(View):

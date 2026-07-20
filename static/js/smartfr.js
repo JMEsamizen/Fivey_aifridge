@@ -1,23 +1,33 @@
-const fileInput = document.getElementById("fileInput");
-const fileName = document.getElementById("fileName");
+document.addEventListener("DOMContentLoaded",()=>{
 
-const form = document.getElementById("uploadForm");
-const button = document.getElementById("submitBtn");
+const inputs=document.querySelectorAll("#fileInput");
 
-fileInput.addEventListener("change", function(){
+inputs.forEach(input=>{
 
-    if(this.files.length){
+    input.addEventListener("change",()=>{
 
-        fileName.innerHTML = "📷 " + this.files[0].name;
+        const fileName=input.files[0]?.name;
+        const label=input.parentElement.querySelector("#fileName");
 
-    }
+        if(fileName && label){
+            label.textContent=fileName;
+        }
+
+    });
 
 });
 
-form.addEventListener("submit", function(){
 
-    button.disabled = true;
+const buttons=document.querySelectorAll(".primary-button");
 
-    button.innerHTML = "Analyzing...";
+buttons.forEach(button=>{
+
+    button.addEventListener("click",()=>{
+
+        button.textContent="Analyzing...";
+
+    });
+
+});
 
 });

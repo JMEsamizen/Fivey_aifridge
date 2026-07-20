@@ -168,7 +168,7 @@ button:active{
 
 form::before{
 
-    content:"🍏 Create your Fivey account";
+    content:"Create your Fivey account";
 
     display:block;
 

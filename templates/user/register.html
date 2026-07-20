@@ -1,171 +1,97 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Fivey - Register</title>
-
+    <title>Fivey | Create Account</title>
     <link rel="stylesheet" href="{% static 'css/register.css' %}">
-
 </head>
-
 
 <body>
 
-
     <div class="auth-container">
 
+        <div class="auth-card">
 
-        <div class="auth-card register-card">
-
-
-            <div class="logo">
-                🍏
+            <div class="brand">
+                <h2>Fivey</h2>
+                <p>AI-powered food & health platform</p>
             </div>
 
-
-            <h1>
-                Create Account
-            </h1>
-
-
-            <p class="subtitle">
-                Join Fivey and make your lifestyle smarter
-            </p>
-
-
+            <div class="auth-header">
+                <h1>Create your account</h1>
+                <p>Start managing your food, nutrition and health with AI.</p>
+            </div>
 
             {% if error %}
-
-            <div class="error">
+            <div class="alert error">
                 {{ error }}
             </div>
-
             {% endif %}
-
-
 
             <form action="{% url 'register' %}" method="post">
 
                 {% csrf_token %}
 
+                <div class="form-grid">
 
+                    <div class="input-group">
+                        <label for="name">First Name</label>
+                        <input id="name" type="text" name="name" placeholder="John" required>
+                    </div>
 
-                <div class="input-group">
-
-                    <label>
-                        Name
-                    </label>
-
-                    <input type="text" name="name" placeholder="Enter your name" required>
-
-                </div>
-
-
-
-                <div class="input-group">
-
-                    <label>
-                        Surname
-                    </label>
-
-                    <input type="text" name="surname" placeholder="Enter your surname">
+                    <div class="input-group">
+                        <label for="surname">Last Name</label>
+                        <input id="surname" type="text" name="surname" placeholder="Doe">
+                    </div>
 
                 </div>
 
-
-
                 <div class="input-group">
-
-                    <label>
-                        Birth date
-                    </label>
-
-                    <input type="date" name="birth-date">
-
+                    <label for="birth-date">Date of Birth</label>
+                    <input id="birth-date" type="date" name="birth-date">
                 </div>
 
-
-
                 <div class="input-group">
-
-                    <label>
-                        Username
-                    </label>
-
-                    <input type="text" name="username" placeholder="Create username" required>
-
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" placeholder="Choose a username" required>
                 </div>
 
-
-
                 <div class="input-group">
-
-                    <label>
-                        Email
-                    </label>
-
-                    <input type="email" name="email" placeholder="Enter your email" required>
-
+                    <label for="email">Email Address</label>
+                    <input id="email" type="email" name="email" placeholder="you@example.com" required>
                 </div>
 
-
-
                 <div class="input-group">
-
-                    <label>
-                        Password
-                    </label>
-
-                    <input type="password" name="password" placeholder="Create password" required>
-
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password" placeholder="Create a secure password"
+                        required>
                 </div>
 
-
-
                 <div class="input-group">
-
-                    <label>
-                        Confirm Password
-                    </label>
-
-                    <input type="password" name="re-password" placeholder="Repeat password" required>
-
+                    <label for="re-password">Confirm Password</label>
+                    <input id="re-password" type="password" name="re-password" placeholder="Repeat your password"
+                        required>
                 </div>
 
-
-
-                <button type="submit">
-                    Create Account 🚀
+                <button type="submit" class="primary-button">
+                    Create Account
                 </button>
-
 
             </form>
 
-
-
-            <p class="register-text">
-
-                Already have an account?
-
+            <div class="auth-footer">
+                <span>Already have an account?</span>
                 <a href="{% url 'login' %}">
-                    Login
+                    Sign In
                 </a>
-
-            </p>
-
-
+            </div>
 
         </div>
 
-
     </div>
-
 
 </body>
 
