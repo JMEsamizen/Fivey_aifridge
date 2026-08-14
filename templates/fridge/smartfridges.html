@@ -25,6 +25,11 @@
 
 <div class="container">
 
+    <nav class="sf-nav" aria-label="Fridge navigation">
+        <a class="sf-nav-btn" href="{% url 'mainpage' %}">🏠 {% trans 'Home' %}</a>
+        <a class="sf-nav-btn" href="{% url 'profile' %}">👤 {% trans 'Profile' %}</a>
+    </nav>
+
     {% if messages %}
         {% for message in messages %}
             <p class="alert {{ message.tags }}">{{ message }}</p>

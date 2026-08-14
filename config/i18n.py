@@ -22,6 +22,7 @@ TRANSLATIONS = {
     "Home": {"ru": "Главная", "uz": "Bosh sahifa"},
     "Smart Fridge": {"ru": "Умный холодильник", "uz": "Aqlli muzlatgich"},
     "Markets": {"ru": "Магазины", "uz": "Bozorlar"},
+    "Recipes": {"ru": "Рецепты", "uz": "Retseptlar"},
     "Profile": {"ru": "Профиль", "uz": "Profil"},
     "Logout": {"ru": "Выйти", "uz": "Chiqish"},
     "Login": {"ru": "Войти", "uz": "Kirish"},

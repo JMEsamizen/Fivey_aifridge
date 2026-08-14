@@ -32,6 +32,11 @@
 
     <main class="fridge-page">
 
+        <nav class="sf-nav" aria-label="Fridge navigation">
+            <a class="sf-nav-btn" href="{% url 'mainpage' %}">🏠 {% trans 'Home' %}</a>
+            <a class="sf-nav-btn" href="{% url 'profile' %}">👤 {% trans 'Profile' %}</a>
+        </nav>
+
         <section class="fridge-card">
 
             <div class="fridge-top">
