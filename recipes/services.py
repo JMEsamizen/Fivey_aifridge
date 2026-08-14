@@ -35,11 +35,20 @@ def _extract_json_object(content):
     return {}
 
 
-def calculate_recipe_nutrition(ingredients_text):
+LANGUAGE_NAMES = {
+    "en": "English",
+    "ru": "Russian",
+    "uz": "Uzbek",
+}
+
+
+def calculate_recipe_nutrition(ingredients_text, language="en"):
     if not OPENAI_API_KEY:
         raise RuntimeError("OPENAI_API_KEY is not configured")
 
     import requests
+
+    lang_name = LANGUAGE_NAMES.get(language, "English")
 
     prompt = f"""
     Quyidagi ingredientlar ro'yxatiga asoslanib umumiy kaloriya, oqsil (protein), uglevod (carbs), yog' (fat) va tolalar (fiber) miqdorini hisoblab ber hamda bu ovqatni iste'mol qilish orqali nimalarga ega bo'lish mumkinligini (benefits) qisqacha tushuntir:
@@ -55,6 +64,8 @@ def calculate_recipe_nutrition(ingredients_text):
         "benefits": ["Qisqa foyda 1", "Qisqa foyda 2", "Qisqa foyda 3"]
     }}
     benefits ro'yxati 3-5 ta qisqa izohdan iborat bo'lsin.
+
+    MUHIM: benefits va boshqa barcha matn javoblari {lang_name} tilida yozilgan bo'lsin.
     """
 
     headers = {

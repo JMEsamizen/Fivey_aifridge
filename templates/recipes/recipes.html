@@ -1,7 +1,7 @@
 {% load i18n_extras %}
 {% load static %}
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="{% current_language %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,11 +31,11 @@
                         <div class="recipe-ingredients">{{ recipe.ingredients|truncatewords:12 }}</div>
                     </div>
                     <button class="btn-view" onclick="openRecipeModal({{ recipe.id }}, '{{ recipe.title|escapejs }}', '{{ recipe.ingredients|escapejs }}')">
-                        Ko'rish & Kaloriya
+                        {% trans 'View & Calories' %}
                     </button>
                 </div>
             {% empty %}
-                <p>Hozircha retseptlar mavjud emas.</p>
+                <p>{% trans 'No recipes yet' %}</p>
             {% endfor %}
         </div>
     </div>
@@ -43,10 +43,10 @@
     <div class="modal" id="recipeModal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeRecipeModal()">&times;</span>
-            <h2 id="modalTitle" style="margin-bottom: 10px;">Retsept Nomi</h2>
+            <h2 id="modalTitle" style="margin-bottom: 10px;">{% trans 'Recipe Name' %}</h2>
             <p id="modalIngredients" style="color: #666; font-size: 0.95rem; margin-bottom: 15px;"></p>
 
-            <h4 style="color: #2c3e50;">🤖 AI Kaloriya Tahlili:</h4>
+            <h4 style="color: #2c3e50;">🤖 {% trans 'AI Calorie Analysis' %}:</h4>
             
             <div class="modal-nutrition" id="nutritionBox">
                 <div>
@@ -77,7 +77,7 @@
             </div>
 
             <div class="modal-benefits" id="benefitsBox" style="display: none;">
-                <h4>🌟 Ushbu ovqatni iste'mol qilish orqali nimalarga ega bo'lasiz</h4>
+                <h4>🌟 {% trans 'What you get by eating this' %}</h4>
                 <ul id="modalBenefits"></ul>
             </div>
         </div>

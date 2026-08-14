@@ -66,7 +66,8 @@ def get_nutrition_api(request):
 
     recipe = get_object_or_404(Recipe, pk=recipe_id)
     try:
-        nutrition = calculate_recipe_nutrition(recipe.ingredients)
+        language = getattr(request, "LANGUAGE_CODE", "en") or "en"
+        nutrition = calculate_recipe_nutrition(recipe.ingredients, language=language)
     except Exception:
         return JsonResponse({"error": "Nutrition analysis is temporarily unavailable"}, status=503)
 

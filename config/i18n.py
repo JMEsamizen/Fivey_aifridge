@@ -98,6 +98,14 @@ EXTRA_TRANSLATIONS = {
         "ru": "ИИ-рецепты и калькулятор калорий",
         "uz": "AI Retseptlar va Kaloriya Hisoblagich",
     },
+    "View & Calories": {"ru": "Смотреть и калории", "uz": "Ko'rish & Kaloriya"},
+    "No recipes yet": {"ru": "Пока нет рецептов", "uz": "Hozircha retseptlar mavjud emas."},
+    "Recipe Name": {"ru": "Название рецепта", "uz": "Retsept Nomi"},
+    "AI Calorie Analysis": {"ru": "ИИ-анализ калорий", "uz": "AI Kaloriya Tahlili"},
+    "What you get by eating this": {
+        "ru": "Что вы получите, съев это блюдо",
+        "uz": "Ushbu ovqatni iste'mol qilish orqali nimalarga ega bo'lasiz",
+    },
     "Recipe Suggestions": {"ru": "Рекомендации по рецептам", "uz": "Retsept bo'yicha tavsiyalar"},
 }
 
