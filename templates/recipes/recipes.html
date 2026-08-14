@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Retseptlar va Kaloriya Hisoblagich</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        /* Retseptlar setkasi */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .recipe-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .recipe-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .recipe-ingredients {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .btn-view {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-view:hover {
+            background-color: #219150;
+        }
+
+        /* Modal Stili */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* AI Ozuqaviy qiymatlar bo'limi */
+        .modal-nutrition {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-nutrition div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-nutrition strong {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .modal-nutrition small {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        /* Loading spinner animatsiyasi */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🥗 AI Retseptlar va Ozuqaviy Qiymat</h1>
+
+        <div class="recipes-grid">
+            {% for recipe in recipes %}
+                <div class="recipe-card">
+                    <div>
+                        <div class="recipe-title">{{ recipe.title }}</div>
+                        <div class="recipe-ingredients">{{ recipe.ingredients|truncatewords:12 }}</div>
+                    </div>
+                    <button class="btn-view" onclick="openRecipeModal({{ recipe.id }}, '{{ recipe.title|escapejs }}', '{{ recipe.ingredients|escapejs }}')">
+                        Ko'rish & Kaloriya
+                    </button>
+                </div>
+            {% empty %}
+                <p>Hozircha retseptlar mavjud emas.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRecipeModal()">&times;</span>
+            <h2 id="modalTitle" style="margin-bottom: 10px;">Retsept Nomi</h2>
+            <p id="modalIngredients" style="color: #666; font-size: 0.95rem; margin-bottom: 15px;"></p>
+
+            <h4 style="color: #2c3e50;">🤖 AI Kaloriya Tahlili:</h4>
+            
+            <div class="modal-nutrition" id="nutritionBox">
+                <div>
+                    <span>🔥</span>
+                    <strong id="modalCalories">0</strong>
+                    <small>Calories</small>
+                </div>
+                <div>
+                    <span>🥩</span>
+                    <strong id="modalProtein">0g</strong>
+                    <small>Protein</small>
+                </div>
+                <div>
+                    <span>🍞</span>
+                    <strong id="modalCarbs">0g</strong>
+                    <small>Carbs</small>
+                </div>
+                <div>
+                    <span>🥑</span>
+                    <strong id="modalFat">0g</strong>
+                    <small>Fat</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modalni ochish va AI orqali ma'lumotlarni yuklash
+        async function openRecipeModal(recipeId, title, ingredients) {
+            const modal = document.getElementById('recipeModal');
+            
+            // Textlarni to'ldirish
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalIngredients').innerText = ingredients;
+
+            // Dastlab "yuklanmoqda" holatiga keltirish
+            document.getElementById('modalCalories').innerText = "...";
+            document.getElementById('modalProtein').innerText = "...";
+            document.getElementById('modalCarbs').innerText = "...";
+            document.getElementById('modalFat').innerText = "...";
+
+            // Modalni ko'rsatish
+            modal.style.display = 'flex';
+
+            // Backendingizdagi AI API endpointiga so'rov yuborish
+            try {
+                const response = await fetch('/recipes/api/calculate-nutrition/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({
+                        recipe_id: recipeId,
+                        ingredients: ingredients
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server xatosi");
+                }
+
+                const data = await response.json();
+
+                // AI qaytargan ma'lumotlarni joy-joyiga qo'yish
+                document.getElementById('modalCalories').innerText = data.calories || 0;
+                document.getElementById('modalProtein').innerText = data.protein || '0g';
+                document.getElementById('modalCarbs').innerText = data.carbs || '0g';
+                document.getElementById('modalFat').innerText = data.fat || '0g';
+
+            } catch (error) {
+                console.error("AI bilan bog'lanishda xatolik:", error);
+                document.getElementById('modalCalories').innerText = "Xato";
+                document.getElementById('modalProtein').innerText = "-";
+                document.getElementById('modalCarbs').innerText = "-";
+                document.getElementById('modalFat').innerText = "-";
+            }
+        }
+
+        function getCookie(name) {
+            const cookie = document.cookie.split('; ').find(row => row.startsWith(name + '='));
+            return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : '';
+        }
+
+        // Modalni yopish
+        function closeRecipeModal() {
+            document.getElementById('recipeModal').style.display = 'none';
+        }
+
+        // Modal tashqarisiga bosilganda yopilishi
+        window.onclick = function(event) {
+            const modal = document.getElementById('recipeModal');
+            if (event.target === modal) {
+                closeRecipeModal();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.utils import timezone
+from django.db import transaction
 from datetime import datetime
+from PIL import Image, UnidentifiedImageError
 
 from .models import Fridge, Product
 from .additional_func import get_product_shape
@@ -25,27 +27,18 @@ class FridgeCreateView(View):
             return redirect("smart-fridge")
         
         if len(name) > 100:
-            return render(
-                request,
-                "fridge/my_fridge.html",
-                {"error": "Product name is too long"}
-            )
+            messages.error(request, "Product name is too long")
+            return redirect("smart-fridge")
 
         try:
             quantity = int(quantity)
         except (ValueError, TypeError):
-            return render(
-                request,
-                "fridge/my_fridge.html",
-                {"error": "Quantity must be a number"}
-            )
+            messages.error(request, "Quantity must be a number")
+            return redirect("smart-fridge")
 
-        if quantity < 1:
-            return render(
-                request,
-                "fridge/my_fridge.html",
-                {"error": "Quantity must be at least 1"}
-            )
+        if not 1 <= quantity <= 10000:
+            messages.error(request, "Quantity must be between 1 and 10,000")
+            return redirect("smart-fridge")
 
         parsed_expire_date = None
 
@@ -56,24 +49,18 @@ class FridgeCreateView(View):
                     "%Y-%m-%d"
                 ).date()
             except ValueError:
-                return render(
-                    request,
-                    "fridge/my_fridge.html",
-                    {"error": "Invalid expiration date"}
-                )
+                messages.error(request, "Invalid expiration date")
+                return redirect("smart-fridge")
 
             if parsed_expire_date < timezone.localdate():
-                return render(
-                    request,
-                    "fridge/my_fridge.html",
-                    {"error": "Expiration date cannot be in the past"}
-                )
+                messages.error(request, "Expiration date cannot be in the past")
+                return redirect("smart-fridge")
 
         fridge, created = Fridge.objects.get_or_create(
             user=request.user
         )
 
-        product = Product.objects.create(
+        Product.objects.create(
             fridge=fridge,
             name=name,
             quantity=quantity,
@@ -81,13 +68,8 @@ class FridgeCreateView(View):
             model_2d=get_product_shape(name)
         )
 
-        return render(
-            request,
-            "fridge/my_fridge.html",
-            {
-                "product": product
-            }
-        )
+        messages.success(request, "Product added to your fridge")
+        return redirect("smart-fridge")
 
 
 class FridgesView(View):
@@ -148,32 +130,30 @@ class FridgesView(View):
             return redirect("smart-fridge")
 
         if file.size > 10 * 1024 * 1024:
-            return render(
-                request,
-                "fridge/smartfridges.html",
-                {
-                    "error": "Image size must be less than 10 MB"
-                }
-            )
+            messages.error(request, "Image size must be less than 10 MB")
+            return redirect("smart-fridge")
+
+        try:
+            Image.open(file).verify()
+            file.seek(0)
+        except (UnidentifiedImageError, OSError):
+            messages.error(request, "The uploaded file is not a valid image")
+            return redirect("smart-fridge")
 
         products = analyze_media(file)
 
         if not isinstance(products, list):
-            return render(
-                request,
-                "fridge/smartfridges.html",
-                {
-                    "error": "Could not analyze the image"
-                }
-            )
+            messages.error(request, "Could not analyze the image")
+            return redirect("smart-fridge")
 
         fridge, created = Fridge.objects.get_or_create(
             user=request.user
         )
 
-        fridge.products.all().delete()
-
+        normalized_products = []
         for product in products:
+            if not isinstance(product, dict):
+                continue
 
             name = product.get("name")
             quantity = product.get("quantity", 1)
@@ -197,6 +177,7 @@ class FridgesView(View):
 
             if quantity < 1:
                 quantity = 1
+            quantity = min(quantity, 10000)
 
             parsed_expire_date = None
 
@@ -213,12 +194,22 @@ class FridgesView(View):
                 except ValueError:
                     parsed_expire_date = None
 
-            Product.objects.create(
+            normalized_products.append(Product(
                 fridge=fridge,
                 name=name,
                 quantity=quantity,
                 expire_date=parsed_expire_date,
                 model_2d=get_product_shape(name)
-            )
+            ))
+
+        if not normalized_products:
+            messages.error(request, "No food products could be identified; your current inventory was kept")
+            return redirect("smart-fridge")
+
+        with transaction.atomic():
+            fridge.products.all().delete()
+            Product.objects.bulk_create(normalized_products)
+
+        messages.success(request, "Your fridge inventory was updated")
 
         return redirect("smart-fridge")

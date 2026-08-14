@@ -66,6 +66,14 @@ class Product(models.Model):
         ]
     )
 
+    # These fields already exist in the production database from an earlier
+    # version of the product model. Defaults keep both old and fresh databases
+    # compatible while nutrition analysis is optional.
+    calories = models.FloatField(default=0)
+    protein = models.FloatField(default=0)
+    carbs = models.FloatField(default=0)
+    fat = models.FloatField(default=0)
+
     model_2d = models.CharField(
         max_length=255,
         blank=True,
