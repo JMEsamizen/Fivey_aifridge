@@ -1,33 +1,29 @@
-document.addEventListener("DOMContentLoaded",()=>{
+function showProduct(product) {
+    const name = product.dataset.name;
+    const quantity = product.dataset.quantity;
+    const expireDate = product.dataset.expire;
 
-const inputs=document.querySelectorAll("#fileInput");
+    document.getElementById("modalProductName").textContent = name;
 
-inputs.forEach(input=>{
+    document.getElementById("modalQuantity").textContent =
+        "×" + quantity;
 
-    input.addEventListener("change",()=>{
+    document.getElementById("modalExpireDate").textContent =
+        expireDate || "Not available";
 
-        const fileName=input.files[0]?.name;
-        const label=input.parentElement.querySelector("#fileName");
-
-        if(fileName && label){
-            label.textContent=fileName;
-        }
-
-    });
-
-});
+    document.getElementById("productModal").classList.add("active");
+}
 
 
-const buttons=document.querySelectorAll(".primary-button");
+function closeProduct() {
+    document.getElementById("productModal").classList.remove("active");
+}
 
-buttons.forEach(button=>{
 
-    button.addEventListener("click",()=>{
+document.addEventListener("click", function (event) {
+    const modal = document.getElementById("productModal");
 
-        button.textContent="Analyzing...";
-
-    });
-
-});
-
+    if (event.target === modal) {
+        closeProduct();
+    }
 });

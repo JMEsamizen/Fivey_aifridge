@@ -1,4 +1,5 @@
-\{% load static %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,9 +14,9 @@
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        {% if new_user %}
+    {% if new_user %}
 
         <section class="fridge-empty">
 
@@ -28,13 +29,23 @@
                 </p>
             </div>
 
-            <form method="POST" enctype="multipart/form-data" class="upload-form">
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="upload-form"
+            >
 
                 {% csrf_token %}
 
                 <label class="upload-box">
 
-                    <input id="fileInput" type="file" name="file" accept="image/*,video/*" required>
+                    <input
+                        id="fileInput"
+                        type="file"
+                        name="file"
+                        accept="image/*,video/*"
+                        required
+                    >
 
                     <span id="fileName">
                         Upload fridge image
@@ -42,7 +53,10 @@
 
                 </label>
 
-                <button type="submit" class="primary-button">
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
                     Analyze Fridge
                 </button>
 
@@ -50,12 +64,9 @@
 
         </section>
 
-
-        {% else %}
+    {% else %}
 
         <section class="fridge-dashboard">
-
-
 
             <div class="dashboard-header">
 
@@ -72,8 +83,6 @@
                 </span>
 
             </div>
-
-
 
 
             <div class="fridge">
@@ -93,154 +102,71 @@
 
                 <div class="fridge-inside">
 
-                
-                    <div class="shelf">
+                    {% for shelf in shelves %}
 
-                        {% for product in products|slice:":5" %}
+                        <div class="shelf">
 
-                        <div class="fridge-product">
+                            {% for product in shelf %}
 
-                            <div class="product-visual">
+                                <div
+                                    class="fridge-product"
+                                    onclick="showProduct(this)"
+                                    data-name="{{ product.name }}"
+                                    data-quantity="{{ product.quantity }}"
+                                    data-expire="{{ product.expire_date|date:'d.m.Y' }}"
+                                >
 
-                                <img src="/media/product_shapes/{{ product.model_2d }}" alt="{{ product.name }}"
-                                    onerror="this.src='/media/product_shapes/default.svg';">
+                                    <div class="product-visual">
 
-                            </div>
+                                        <img
+                                            src="/media/product_shapes/{{ product.model_2d }}"
+                                            alt="{{ product.name }}"
+                                            onerror="this.src='/media/product_shapes/default.svg';"
+                                        >
 
-                            <div class="product-info">
+                                    </div>
 
-                                <span class="product-name">
-                                    {{ product.name }}
-                                </span>
+                                    <div class="product-info">
 
-                                <span class="product-quantity">
-                                    ×{{ product.quantity }}
-                                </span>
+                                        <span class="product-name">
+                                            {{ product.name }}
+                                        </span>
 
-                            </div>
+                                        <span class="product-quantity">
+                                            ×{{ product.quantity }}
+                                        </span>
 
-                        </div>
+                                    </div>
 
-                        {% endfor %}
+                                </div>
 
-                    </div>
-
-
-       
-
-                    <div class="shelf">
-
-                        {% for product in products|slice:"5:10" %}
-
-                        <div class="fridge-product">
-
-                            <div class="product-visual">
-
-                                <img src="/media/product_shapes/{{ product.model_2d }}" alt="{{ product.name }}"
-                                    onerror="this.src='/media/product_shapes/default.svg';">
-
-                            </div>
-
-                            <div class="product-info">
-
-                                <span class="product-name">
-                                    {{ product.name }}
-                                </span>
-
-                                <span class="product-quantity">
-                                    ×{{ product.quantity }}
-                                </span>
-
-                            </div>
+                            {% endfor %}
 
                         </div>
 
-                        {% endfor %}
-
-                    </div>
-
-
-                 
-
-                    <div class="shelf">
-
-                        {% for product in products|slice:"10:15" %}
-
-                        <div class="fridge-product">
-
-                            <div class="product-visual">
-
-                                <img src="/media/product_shapes/{{ product.model_2d }}" alt="{{ product.name }}"
-                                    onerror="this.src='/media/product_shapes/default.svg';">
-
-                            </div>
-
-                            <div class="product-info">
-
-                                <span class="product-name">
-                                    {{ product.name }}
-                                </span>
-
-                                <span class="product-quantity">
-                                    ×{{ product.quantity }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
-
-            
-                    <div class="shelf">
-
-                        {% for product in products|slice:"15:20" %}
-
-                        <div class="fridge-product">
-
-                            <div class="product-visual">
-
-                                <img src="/media/product_shapes/{{ product.model_2d }}" alt="{{ product.name }}"
-                                    onerror="this.src='/media/product_shapes/default.svg';">
-
-                            </div>
-
-                            <div class="product-info">
-
-                                <span class="product-name">
-                                    {{ product.name }}
-                                </span>
-
-                                <span class="product-quantity">
-                                    ×{{ product.quantity }}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        {% endfor %}
-
-                    </div>
-
+                    {% endfor %}
 
                 </div>
 
             </div>
 
 
-      
-
-            <form method="POST" enctype="multipart/form-data" class="update-form">
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="update-form"
+            >
 
                 {% csrf_token %}
 
                 <label class="upload-box">
 
-                    <input id="fileInput" type="file" name="file" accept="image/*">
+                    <input
+                        id="fileInput"
+                        type="file"
+                        name="file"
+                        accept="image/*"
+                    >
 
                     <span id="fileName">
                         Upload new scan
@@ -248,21 +174,58 @@
 
                 </label>
 
-                <button type="submit" class="primary-button">
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
                     Update Inventory
                 </button>
 
             </form>
 
-
         </section>
 
-        {% endif %}
+    {% endif %}
+
+</div>
+
+
+<!-- Product modal -->
+
+<div id="productModal" class="product-modal">
+
+    <div class="product-modal-card">
+
+        <button
+            type="button"
+            class="modal-close"
+            onclick="closeProduct()"
+        >
+            ×
+        </button>
+
+        <h2 id="modalProductName"></h2>
+
+        <div class="modal-info">
+
+            <div>
+                <span>Quantity</span>
+                <strong id="modalQuantity"></strong>
+            </div>
+
+            <div>
+                <span>Expire date</span>
+                <strong id="modalExpireDate"></strong>
+            </div>
+
+        </div>
 
     </div>
 
+</div>
 
-    <script src="{% static 'js/smartfr.js' %}"></script>
+
+<script src="{% static 'js/smartfr.js' %}"></script>
 
 </body>
 

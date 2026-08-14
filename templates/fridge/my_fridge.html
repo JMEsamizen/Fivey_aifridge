@@ -1,13 +1,79 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Smart-Fridge</title>
+
+    <title>Fivey | My Smart-Fridge</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="{% static 'css/my_fridge.css' %}">
 </head>
+
 <body>
-    <h1>{{ fridge.title }}</h1>
-    <p>{{ fridge.description }}</p>
-    <p>Created at: {{ fridge.created_at }}</p>
+
+    <main class="fridge-page">
+
+        <section class="fridge-card">
+
+            <div class="fridge-top">
+                <div class="brand">
+                    <span class="brand-dot"></span>
+                    Fivey
+                </div>
+
+                <span class="status">
+                    <span class="status-dot"></span>
+                    SMART FRIDGE
+                </span>
+            </div>
+
+            <div class="fridge-content">
+
+                <span class="eyebrow">MY SMART-FRIDGE</span>
+
+                <h1>{{ fridge.title }}</h1>
+
+                <p class="description">
+                    {{ fridge.description }}
+                </p>
+
+                <div class="divider"></div>
+
+                <div class="fridge-info">
+
+                    <div class="info-item">
+                        <span class="info-label">STATUS</span>
+                        <span class="info-value active">
+                            ACTIVE
+                        </span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">CREATED</span>
+                        <span class="info-value">
+                            {{ fridge.created_at }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="scan-line"></div>
+
+        </section>
+
+    </main>
+
 </body>
 </html>

@@ -1,6 +1,7 @@
 import requests
 import base64
 import json
+from datetime import datetime
 from getenv import API_KEY as AI_KEY
 
 
@@ -23,8 +24,7 @@ def analyze_media(file):
 
         json={
             "model": "openai/gpt-4o-mini",
-
-            "max_tokens": 500,
+            "max_tokens": 700,
 
             "messages": [
                 {
@@ -39,20 +39,44 @@ Do not add explanations.
 
 The response MUST be a JSON array.
 
-Each product must have:
+Each product MUST have:
+
 - "name": product name
 - "quantity": integer quantity
+- "expire_date": expiration date in YYYY-MM-DD format
 
 Example:
+
 [
-    {"name": "Milk", "quantity": 2},
-    {"name": "Eggs", "quantity": 12},
-    {"name": "Apple", "quantity": 5},
-    {"name": "Cheese", "quantity": 1}
+    {
+        "name": "Milk",
+        "quantity": 2,
+        "expire_date": "2026-08-20"
+    },
+    {
+        "name": "Eggs",
+        "quantity": 12,
+        "expire_date": "2026-09-01"
+    },
+    {
+        "name": "Apple",
+        "quantity": 5,
+        "expire_date": null
+    }
 ]
 
+IMPORTANT:
+
+If the expiration date is visible on the package, return it.
+
+If the expiration date cannot be determined from the image,
+return null.
+
+NEVER invent an expiration date.
+
+If quantity cannot be determined, use 1.
+
 If you are unsure about a product, still include it.
-If you cannot determine the quantity, use 1.
 """
                 },
 
@@ -61,7 +85,7 @@ If you cannot determine the quantity, use 1.
                     "content": [
                         {
                             "type": "text",
-                            "text": "What food products are in this fridge?"
+                            "text": "Identify all food products in this fridge and determine their expiration dates if visible."
                         },
 
                         {

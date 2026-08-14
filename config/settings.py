@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #apps
     'user',
-    'market',
     'fridge',
 ]
 
@@ -120,3 +119,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "mainpage"
+LOGOUT_REDIRECT_URL = "mainpage"
