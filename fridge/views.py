@@ -5,7 +5,7 @@ from datetime import datetime
 
 from .models import Fridge, Product
 from .additional_func import get_product_shape
-from user.ai_utils import analyze_media
+from fridge.ai_utils import analyze_media
 
 from django.contrib import messages
 
