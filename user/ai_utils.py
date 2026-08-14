@@ -1,29 +1,19 @@
-#AI message
 import requests
 import base64
-from getenv import OPENROUTER_API_KEY as AI_KEY
-
-
+import json
+from getenv import API_KEY as AI_KEY
 
 
 def analyze_media(file):
-
     file_bytes = file.read()
-
     content_type = file.content_type
 
-
     if not content_type.startswith("image"):
-        return "Пока поддерживаются только изображения."
+        return []
 
-
-    encoded_file = base64.b64encode(
-        file_bytes
-    ).decode("utf-8")
-
+    encoded_file = base64.b64encode(file_bytes).decode("utf-8")
 
     response = requests.post(
-
         "https://openrouter.ai/api/v1/chat/completions",
 
         headers={
@@ -32,64 +22,77 @@ def analyze_media(file):
         },
 
         json={
-
             "model": "openai/gpt-4o-mini",
-            
+
             "max_tokens": 500,
-            
+
             "messages": [
+                {
+                    "role": "system",
+                    "content": """
+You identify food products in refrigerator images.
 
-    {
-        "role": "system",
-        "content": """
-        You are an AI that identifies products in a refrigerator from images. 
-        Your response should only include the list of products.
+Return ONLY valid JSON.
+Do not use Markdown.
+Do not use ```json.
+Do not add explanations.
 
-        Response only with the list of products and their quantities.
-        Do not include any additional information.
+The response MUST be a JSON array.
 
-        Response format:
+Each product must have:
+- "name": product name
+- "quantity": integer quantity
 
-        🥛 Milk - 2
-        🥚 Eggs - 12
-        🍎 Apple - 5
-        🧀 Cheese - 1
-
-        If you are not sure about a product, mark it as "not sure".
-        """
-    },
-
-    {
-        "role": "user",
-        "content": [
-
-            {
-                "type": "text",
-                "text": "What products are in this fridge?"
-            },
-
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:{content_type};base64,{encoded_file}"
-                }
-            }
-
-        ]
-    }
-
+Example:
+[
+    {"name": "Milk", "quantity": 2},
+    {"name": "Eggs", "quantity": 12},
+    {"name": "Apple", "quantity": 5},
+    {"name": "Cheese", "quantity": 1}
 ]
 
+If you are unsure about a product, still include it.
+If you cannot determine the quantity, use 1.
+"""
+                },
+
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "What food products are in this fridge?"
+                        },
+
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{content_type};base64,{encoded_file}"
+                            }
+                        }
+                    ]
+                }
+            ]
         }
-
     )
-
 
     data = response.json()
 
+    if "choices" not in data:
+        print("AI ERROR:", data)
+        return []
 
-    if "choices" in data:
-        return data["choices"][0]["message"]["content"]
+    content = data["choices"][0]["message"]["content"]
 
+    try:
+        products = json.loads(content)
 
-    return "Error AI: " + str(data)
+        if not isinstance(products, list):
+            return []
+
+        return products
+
+    except json.JSONDecodeError:
+        print("AI returned invalid JSON:")
+        print(content)
+        return []

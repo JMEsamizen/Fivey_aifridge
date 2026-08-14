@@ -2,93 +2,16 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-from .ai_utils import analyze_media
-from .models import Profile, Product, Fridge
+from .models import Profile
 from django.contrib.auth import authenticate
 
 class Mainpageview(View):
     def get(self, request):
       return render(request, 'mainpage.html')
 
-
-class FridgesView(View):
-
-    def get(self, request):
-
-        if not request.user.is_authenticated:
-            return render(
-                request,
-                "user/smartfridges.html",
-                {"new_user": True}
-            )
-
-        fridge, created = Fridge.objects.get_or_create(
-            user=request.user
-        )
-
-        products = fridge.products.all()
-
-        return render(
-            request,
-            "user/smartfridges.html",
-            {
-                "new_user": not products.exists(),
-                "products": products,
-                "fridge": fridge
-            }
-        )
-
-    def post(self, request):
-
-        if not request.user.is_authenticated:
-            return redirect("login")
-
-        file = request.FILES.get("file")
-
-        if not file:
-            return render(
-                request,
-                "user/smartfridges.html",
-                {"error": "File not selected"}
-            )
-
-        answer = analyze_media(file)
-
-        fridge, created = Fridge.objects.get_or_create(
-            user=request.user
-        )
-
-        fridge.products.all().delete()
-
-        lines = answer.split("\n")
-
-        for line in lines:
-
-            product_name = line.strip()
-
-            if product_name:
-
-                Product.objects.create(
-                    fridge=fridge,
-                    name=product_name
-                )
-
-        return redirect("smart-fridge")
-    
-
 class MarketsView(View):
     def get(self, request):
         return render(request, 'user/markets.html')
-
-
-class RecipiesView(View):
-    def get(self, request):
-        return render(request, 'user/recipies.html')
-
-
-class MyHealthView(View):
-    def get(self, request):
-        return render(request, 'user/myhealth.html')
 
 class RegisterView(View):
 
@@ -174,7 +97,6 @@ class LoginView(View):
 
         return redirect("mainpage")
 
-
 class LogoutView(View):
 
     def post(self, request):
@@ -188,42 +110,4 @@ class LogoutView(View):
         logout(request)
 
         return redirect("mainpage") 
-
-
-class AIAnalyzeView(View):
-
-    def get(self, request):
-
-        return render(
-            request,
-            "user/ai_analyze.html"
-        )
-
-
-    def post(self, request):
-
-        file = request.FILES.get("file")
-
-
-        if not file:
-
-            return render(
-                request,
-                "user/ai_analyze.html",
-                {
-                    "answer": "Файл не выбран"
-                }
-            )
-
-
-        answer = analyze_media(file)
-
-
-        return render(
-            request,
-            "user/ai_analyze.html",
-            {
-                "answer": answer
-            }
-        )
 
