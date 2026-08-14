@@ -184,7 +184,3 @@ class LogoutView(View):
     def post(self, request):
         logout(request)
         return redirect("mainpage")
-
-    def get(self, request):
-        logout(request)
-        return redirect("mainpage")

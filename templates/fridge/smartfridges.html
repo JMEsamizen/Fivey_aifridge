@@ -16,6 +16,12 @@
 
 <div class="container">
 
+    {% if messages %}
+        {% for message in messages %}
+            <p class="alert {{ message.tags }}">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
     {% if new_user %}
 
         <section class="fridge-empty">
@@ -43,7 +49,7 @@
                         id="fileInput"
                         type="file"
                         name="file"
-                        accept="image/*,video/*"
+                        accept="image/jpeg,image/png,image/webp"
                         required
                     >
 
@@ -165,7 +171,7 @@
                         id="fileInput"
                         type="file"
                         name="file"
-                        accept="image/*"
+                        accept="image/jpeg,image/png,image/webp"
                     >
 
                     <span id="fileName">

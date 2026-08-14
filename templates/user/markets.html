@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fivey | Markets</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <main class="hero">
+        <div class="hero-content">
+            <div class="eyebrow"><span class="status-dot"></span>FIVEY MARKETS</div>
+            <h1>Food markets,<br>coming soon.</h1>
+            <p class="hero-sub">We are preparing smart shopping suggestions based on your fridge inventory.</p>
+            <a class="btn btn-primary" href="{% url 'mainpage' %}">Back to home</a>
+        </div>
+    </main>
+</body>
+</html>

@@ -6,15 +6,14 @@ from getenv import API_KEY as AI_KEY
 
 
 def analyze_media(file):
-    file_bytes = file.read()
-    content_type = file.content_type
+    try:
+        file_bytes = file.read()
+        content_type = file.content_type
+        if not content_type or not content_type.startswith("image"):
+            return []
 
-    if not content_type.startswith("image"):
-        return []
-
-    encoded_file = base64.b64encode(file_bytes).decode("utf-8")
-
-    response = requests.post(
+        encoded_file = base64.b64encode(file_bytes).decode("utf-8")
+        response = requests.post(
         "https://openrouter.ai/api/v1/chat/completions",
 
         headers={
@@ -97,26 +96,15 @@ If you are unsure about a product, still include it.
                     ]
                 }
             ]
-        }
-    )
-
-    data = response.json()
-
-    if "choices" not in data:
-        print("AI ERROR:", data)
-        return []
-
-    content = data["choices"][0]["message"]["content"]
-
-    try:
+            },
+            timeout=(5, 45),
+        )
+        response.raise_for_status()
+        data = response.json()
+        content = data["choices"][0]["message"]["content"]
         products = json.loads(content)
-
         if not isinstance(products, list):
             return []
-
         return products
-
-    except json.JSONDecodeError:
-        print("AI returned invalid JSON:")
-        print(content)
+    except (requests.RequestException, KeyError, IndexError, TypeError, json.JSONDecodeError, ValueError):
         return []

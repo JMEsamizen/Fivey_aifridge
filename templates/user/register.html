@@ -15,6 +15,12 @@
 
         <div class="auth-card">
 
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
             <div class="brand">
                 <h2>Fivey</h2>
                 <p>AI-powered food & health platform</p>

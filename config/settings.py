@@ -1,24 +1,35 @@
+import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+from getenv import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7)adot&*$!z-ejvuno1!j=i#pz8sk&fr2nwa@9*npq*(8@ytb-'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = ["*"]
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY must be configured when DEBUG is False")
+    SECRET_KEY = "development-only-3f9e0a49fa344bd0b1327f8c5e751f0c0d93c62b5cf84252"
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.ngrok-free.dev',  # Wildcard for ngrok subdomains
-]
+ALLOWED_HOSTS = [host for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host]
+
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if origin]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 31_536_000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
 
 # Application definition
@@ -33,6 +44,7 @@ INSTALLED_APPS = [
     #apps
     'user',
     'fridge',
+    'recipes',
 ]
 
 MIDDLEWARE = [
@@ -71,11 +83,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fivey_db',
-        'USER': 'postgres',
-        'PASSWORD': '4224',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
@@ -114,7 +126,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'

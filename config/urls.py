@@ -7,6 +7,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('user.urls')),
     path('fridge/', include('fridge.urls')),
+    path('recipes/', include('recipes.urls')),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
