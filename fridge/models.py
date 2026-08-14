@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 class FridgeItem(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    model_3d = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -31,6 +30,7 @@ class Product(models.Model):
     fridge = models.ForeignKey(Fridge, on_delete=models.CASCADE, related_name="products")
     name = models.CharField(max_length=100)
     quantity = models.IntegerField(default=1)
+    model_2d = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

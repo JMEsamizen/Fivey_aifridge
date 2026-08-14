@@ -2,16 +2,30 @@ from django.shortcuts import render, redirect
 from .models import FridgeItem, Fridge, Product
 from django.views import View
 from user.ai_utils import analyze_media
-
+from .additional_func import get_product_shape
 
 class FridgeCreateView(View):
     def post(self, request):
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-    
-        new_fridge = FridgeItem.objects.create(title=title, description=description)
-        return render(request, 'fridge/my_fridge.html', {'fridge': new_fridge})
-    
+        name = request.POST.get("name")
+        quantity = request.POST.get("quantity", 1)
+
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        fridge, created = Fridge.objects.get_or_create(user=request.user)
+
+        product = Product.objects.create(
+            fridge=fridge,
+            name=name,
+            quantity=quantity,
+            model_2d=get_product_shape(name)
+        )
+
+        return render(
+            request,
+            "fridge/my_fridge.html",
+            {"product": product}
+        )
 
 class FridgesView(View):
     def get(self, request):
@@ -54,10 +68,14 @@ class FridgesView(View):
             quantity = product.get("quantity", 1)
 
             if name and name.strip():
+
+                name = name.strip()
+
                 Product.objects.create(
                     fridge=fridge,
-                    name=name.strip(),
-                    quantity=quantity
+                    name=name,
+                    quantity=quantity,
+                    model_2d=get_product_shape(name)
                 )
 
         return redirect("smart-fridge") 

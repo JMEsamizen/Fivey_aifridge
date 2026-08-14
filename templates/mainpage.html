@@ -5,41 +5,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fivey - Smart Food Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 
 <body>
 
-<header class="navbar">
-    <div class="logo">
-        Fivey
+<header class="navbar" id="navbar">
+    <div class="nav-inner">
+
+        <a href="{% url 'mainpage' %}" class="logo">
+            Fivey
+        </a>
+
+        <nav class="nav-links">
+            <a href="{% url 'mainpage' %}">Home</a>
+            <a href="{% url 'smart-fridge' %}">Smart Fridge</a>
+            <a href="{% url 'markets' %}">Markets</a>
+        </nav>
+
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+
+            <span class="nav-user">
+                {{ user.username }}
+            </span>
+
+            <form action="{% url 'logout' %}" method="post" class="logout-form">
+                {% csrf_token %}
+                <button class="logout-btn" type="submit">
+                    Logout
+                </button>
+            </form>
+
+            {% else %}
+
+            <a class="nav-login" href="{% url 'login' %}">
+                Login
+            </a>
+
+            <a class="nav-signup" href="{% url 'register' %}">
+                Sign Up
+            </a>
+
+            {% endif %}
+        </div>
+
+        <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
     </div>
 
-    <div class="nav-actions">
-        {% if user.is_authenticated %}
-
-        <span>
-            {{ user.username }}
-        </span>
-
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button class="logout-btn">
-                Logout
-            </button>
-        </form>
-
-        {% else %}
-
-        <a href="{% url 'login' %}">
-            Login
-        </a>
-
-        <a class="nav-signup" href="{% url 'register' %}">
-            Sign Up
-        </a>
-
-        {% endif %}
+    <div class="nav-mobile" id="navMobile">
+        <a href="{% url 'mainpage' %}">Home</a>
+        <a href="{% url 'smart-fridge' %}">Smart Fridge</a>
+        <a href="{% url 'markets' %}">Markets</a>
+        <div class="nav-mobile-actions">
+            {% if user.is_authenticated %}
+            <span class="nav-user">{{ user.username }}</span>
+            <form action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button class="logout-btn" type="submit">Logout</button>
+            </form>
+            {% else %}
+            <a class="nav-login" href="{% url 'login' %}">Login</a>
+            <a class="nav-signup" href="{% url 'register' %}">Sign Up</a>
+            {% endif %}
+        </div>
     </div>
 </header>
 
@@ -49,60 +85,231 @@
 
     <div class="hero-content">
 
-        <h1>
-            Your food.
+        <div class="eyebrow reveal-up" style="--d:0">
+            <span class="status-dot"></span>
+            AI&#8209;POWERED SMART FRIDGE
+        </div>
+
+        <h1 class="reveal-up" style="--d:1">
+            Your fridge.
             <br>
-            Smarter with AI.
+            Smarter than ever.
         </h1>
 
-        <p>
-            Fivey transforms your fridge into an intelligent
-            food assistant. Scan products, reduce waste,
-            and get personalized recommendations.
+        <p class="hero-sub reveal-up" style="--d:2">
+            Fivey uses AI to recognize what's inside your fridge and
+            turns it into a smart digital inventory &mdash; scan once,
+            know exactly what you have.
         </p>
 
-        <div class="hero-buttons">
+        <div class="hero-buttons reveal-up" style="--d:3">
 
-            <a href="{% url 'register' %}" class="primary-btn">
+            <a href="{% url 'register' %}" class="btn btn-primary">
                 Get Started
             </a>
 
-            <a href="{% url 'smart-fridge' %}" class="create-btn">
-                Create Fridge
+            <a href="{% url 'smart-fridge' %}" class="btn btn-secondary">
+                Create Your Smart Fridge
             </a>
 
         </div>
 
-        <div class="trust">
-            Trusted AI-powered food management
+        <div class="trust reveal-up" style="--d:4">
+            Real-time AI product recognition &nbsp;&middot;&nbsp; No manual entry
         </div>
 
     </div>
 
 
-    <div class="hero-card">
+    <div class="hero-visual reveal-up" style="--d:2" id="heroVisual">
 
-        <div class="fridge-preview">
+        <div class="fridge-glow"></div>
 
-            <div class="preview-header">
-                Smart Fridge
+        <div class="fridge" id="fridgeParallax">
+
+            <div class="fridge-bezel">
+
+                <div class="fridge-top-row">
+                    <span class="fridge-brand">FIVEY</span>
+                    <span class="fridge-status">
+                        <span class="status-dot"></span>
+                        AI VISION ONLINE
+                    </span>
+                </div>
+
+                <div class="fridge-glass">
+
+                    <div class="scan-line"></div>
+
+                    <div class="fridge-shelf">
+                        <div class="scan-product float-a">
+                            <span class="dot"></span>
+                            <span class="p-name">Milk</span>
+                            <span class="p-tag">FRESH</span>
+                        </div>
+                        <div class="scan-product float-b">
+                            <span class="dot"></span>
+                            <span class="p-name">Vegetables</span>
+                            <span class="p-tag">HEALTHY</span>
+                        </div>
+                    </div>
+
+                    <div class="fridge-shelf">
+                        <div class="scan-product float-c">
+                            <span class="dot"></span>
+                            <span class="p-name">Eggs</span>
+                            <span class="p-tag">×12</span>
+                        </div>
+                        <div class="scan-product float-a">
+                            <span class="dot"></span>
+                            <span class="p-name">Juice</span>
+                            <span class="p-tag">×1</span>
+                        </div>
+                    </div>
+
+                    <div class="fridge-readout">
+                        <span>ITEMS DETECTED</span>
+                        <span class="readout-num" data-target="18">0</span>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="product">
-                Milk
-                <span>Fresh</span>
-            </div>
+            <div class="fridge-base"></div>
 
-            <div class="product">
-                Vegetables
-                <span>Healthy</span>
-            </div>
+        </div>
 
-            <div class="product">
-                Eggs
-                <span>Available</span>
-            </div>
+    </div>
 
+</section>
+
+
+<section class="how-it-works" id="how">
+
+    <div class="section-head reveal-on-scroll">
+        <span class="eyebrow-small">The process</span>
+        <h2>How Fivey works</h2>
+    </div>
+
+    <div class="steps">
+
+        <div class="step reveal-on-scroll">
+            <span class="step-num">01</span>
+            <h3>Scan</h3>
+            <p>Upload a photo of your fridge.</p>
+        </div>
+
+        <div class="step-line reveal-on-scroll"></div>
+
+        <div class="step reveal-on-scroll">
+            <span class="step-num">02</span>
+            <h3>AI Analysis</h3>
+            <p>Fivey identifies products using AI.</p>
+        </div>
+
+        <div class="step-line reveal-on-scroll"></div>
+
+        <div class="step reveal-on-scroll">
+            <span class="step-num">03</span>
+            <h3>Smart Inventory</h3>
+            <p>Your fridge becomes a digital inventory.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="fridge-preview-section">
+
+    <div class="preview-copy reveal-on-scroll">
+        <span class="eyebrow-small">Your inventory</span>
+        <h2>Meet your digital fridge.</h2>
+        <p>
+            Every product you scan lives inside a visual, always up to
+            date fridge interface. See what you have, track quantities,
+            and update your inventory whenever you scan again.
+        </p>
+
+        <ul class="preview-list">
+            <li>See your products, laid out shelf by shelf</li>
+            <li>Track exact quantities for every item</li>
+            <li>Update your inventory with a new scan, anytime</li>
+        </ul>
+
+        <a href="{% url 'smart-fridge' %}" class="btn btn-primary">
+            Create My Smart Fridge
+        </a>
+    </div>
+
+    <div class="preview-visual reveal-on-scroll">
+
+        <div class="fridge fridge-small">
+            <div class="fridge-bezel">
+                <div class="fridge-top-row">
+                    <span class="fridge-brand">FIVEY</span>
+                    <span class="fridge-status">
+                        <span class="status-dot"></span>
+                        SMART FRIDGE
+                    </span>
+                </div>
+                <div class="fridge-glass">
+                    <div class="fridge-shelf">
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Milk</span><span class="p-tag">×1</span></div>
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Cheese</span><span class="p-tag">×2</span></div>
+                    </div>
+                    <div class="fridge-shelf">
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Vegetables</span><span class="p-tag">×5</span></div>
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Eggs</span><span class="p-tag">×12</span></div>
+                    </div>
+                    <div class="fridge-shelf">
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Juice</span><span class="p-tag">×1</span></div>
+                        <div class="scan-product"><span class="dot"></span><span class="p-name">Butter</span><span class="p-tag">×1</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="fridge-base"></div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="ai-section">
+
+    <div class="section-head reveal-on-scroll">
+        <span class="eyebrow-small">Under the hood</span>
+        <h2>Your fridge, understood by AI.</h2>
+    </div>
+
+    <div class="ai-flow reveal-on-scroll">
+
+        <div class="ai-node">
+            <span class="ai-node-icon">img</span>
+            <span>Fridge Image</span>
+        </div>
+
+        <div class="ai-connector"><span class="pulse-particle"></span></div>
+
+        <div class="ai-node">
+            <span class="ai-node-icon">AI</span>
+            <span>AI Vision</span>
+        </div>
+
+        <div class="ai-connector"><span class="pulse-particle"></span></div>
+
+        <div class="ai-node">
+            <span class="ai-node-icon">id</span>
+            <span>Product Recognition</span>
+        </div>
+
+        <div class="ai-connector"><span class="pulse-particle"></span></div>
+
+        <div class="ai-node ai-node-final">
+            <span class="ai-node-icon">✓</span>
+            <span>Digital Inventory</span>
         </div>
 
     </div>
@@ -112,47 +319,60 @@
 
 <section class="features">
 
-    <div class="feature">
-
-        <h3>
-            AI Recognition
-        </h3>
-
-        <p>
-            Identify products instantly from images.
-        </p>
-
+    <div class="section-head reveal-on-scroll">
+        <span class="eyebrow-small">Capabilities</span>
+        <h2>What Fivey does</h2>
     </div>
 
+    <div class="feature-grid">
 
-    <div class="feature">
+        <div class="feature reveal-on-scroll">
+            <h3>AI Product Recognition</h3>
+            <p>Automatically identify products from your fridge images.</p>
+        </div>
 
-        <h3>
-            Smart Recipes
-        </h3>
+        <div class="feature reveal-on-scroll">
+            <h3>Smart Inventory</h3>
+            <p>Keep your fridge contents organized digitally.</p>
+        </div>
 
-        <p>
-            Generate meals using your ingredients.
-        </p>
+        <div class="feature reveal-on-scroll">
+            <h3>Quantity Tracking</h3>
+            <p>Always know how many of each product you have.</p>
+        </div>
 
-    </div>
-
-
-    <div class="feature">
-
-        <h3>
-            Health Insights
-        </h3>
-
-        <p>
-            Understand your nutrition better.
-        </p>
+        <div class="feature reveal-on-scroll">
+            <h3>Fast Updates</h3>
+            <p>Scan your fridge again whenever you want, in seconds.</p>
+        </div>
 
     </div>
 
 </section>
 
+
+<section class="final-cta reveal-on-scroll">
+
+    <h2>Ready to make your fridge smarter?</h2>
+    <p>Turn your refrigerator into an intelligent food inventory.</p>
+
+    <div class="hero-buttons">
+        <a href="{% url 'register' %}" class="btn btn-primary">
+            Get Started
+        </a>
+        <a href="{% url 'smart-fridge' %}" class="btn btn-secondary">
+            Create Smart Fridge
+        </a>
+    </div>
+
+</section>
+
 </main>
+
+<footer class="site-footer">
+    <span>Fivey</span>
+    <span>AI-powered food intelligence</span>
+</footer>
 
 <script src="{% static 'js/home.js' %}"></script>
 
