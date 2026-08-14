@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n_extras %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -7,12 +8,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
     <title>Fivey | Smart Fridge</title>
 
     <link rel="stylesheet" href="{% static 'css/smartfr.css' %}">
 </head>
 
 <body>
+
+{% include 'includes/language_switcher.html' %}
 
 <div class="container">
 
@@ -90,6 +99,37 @@
 
             </div>
 
+            {% if expiry_notifications %}
+                <section class="expiry-reminders" aria-live="polite">
+                    <div class="reminders-heading">
+                        <div>
+                            <span class="reminders-eyebrow">Expiry reminders</span>
+                            <h2>Use these products soon</h2>
+                        </div>
+                        <button class="enable-notifications" id="enableNotifications" type="button">Enable browser reminders</button>
+                    </div>
+
+                    <div class="reminders-list">
+                        {% for notification in expiry_notifications %}
+                            <a
+                                class="expiry-reminder"
+                                href="{% url 'notification-open' notification.id %}"
+                                data-notification-id="{{ notification.id }}"
+                                data-notification-title="{{ notification.product_name }} expires soon"
+                                data-notification-message="{{ notification.message }}"
+                            >
+                                <span class="reminder-icon" aria-hidden="true">!</span>
+                                <span>
+                                    <strong>{{ notification.product_name }}</strong>
+                                    <small>{{ notification.message }}</small>
+                                </span>
+                                <span class="reminder-link">Find recipes</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
 
             <div class="fridge">
 
@@ -114,12 +154,10 @@
 
                             {% for product in shelf %}
 
-                                <div
+                                <article
                                     class="fridge-product"
-                                    onclick="showProduct(this)"
-                                    data-name="{{ product.name }}"
-                                    data-quantity="{{ product.quantity }}"
-                                    data-expire="{{ product.expire_date|date:'d.m.Y' }}"
+                                    tabindex="0"
+                                    aria-label="{{ product.name }} details"
                                 >
 
                                     <div class="product-visual">
@@ -144,7 +182,53 @@
 
                                     </div>
 
-                                </div>
+                                    <div class="product-details">
+                                        <strong class="details-title">{{ product.name }}</strong>
+
+                                        <div class="detail-row">
+                                            <span>Quantity</span>
+                                            <strong>{{ product.quantity }}</strong>
+                                        </div>
+
+                                        <div class="detail-row">
+                                            <span>Expires</span>
+                                            <strong>{% if product.expire_date %}{{ product.expire_date|date:'d.m.Y' }}{% else %}Not specified{% endif %}</strong>
+                                        </div>
+
+                                        <div class="nutrition-grid" aria-label="Estimated nutrition per serving">
+                                            <div><span>Calories</span><strong>{{ product.calories|floatformat:'-0' }} kcal</strong></div>
+                                            <div><span>Protein</span><strong>{{ product.protein|floatformat:'-1' }} g</strong></div>
+                                            <div><span>Carbs</span><strong>{{ product.carbs|floatformat:'-1' }} g</strong></div>
+                                            <div><span>Fat</span><strong>{{ product.fat|floatformat:'-1' }} g</strong></div>
+                                        </div>
+
+                                        <div class="detail-row">
+                                            <span>Benefits</span>
+                                            <strong>{{ product.benefits|default:'Not analyzed yet' }}</strong>
+                                        </div>
+
+                                        <div class="detail-row warning-row">
+                                            <span>Dietary notes</span>
+                                            <strong>{{ product.warnings|default:'No specific notes' }}</strong>
+                                        </div>
+
+                                        <small class="nutrition-note">Nutrition values are AI estimates per serving.</small>
+
+                                        <form class="product-action edit-product-form" method="post" action="{% url 'product-edit' product.id %}">
+                                            {% csrf_token %}
+                                            <label>Name<input name="name" value="{{ product.name }}" maxlength="100" required></label>
+                                            <label>Quantity<input name="quantity" type="number" min="1" max="10000" value="{{ product.quantity }}" required></label>
+                                            <label>Expires<input name="expire_date" type="date" value="{{ product.expire_date|date:'Y-m-d' }}"></label>
+                                            <button type="submit" class="product-action-button">Save changes</button>
+                                        </form>
+
+                                        <form class="product-action delete-product-form" method="post" action="{% url 'product-delete' product.id %}" onsubmit="return confirm('Delete {{ product.name|escapejs }}?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="product-action-button delete-button">Delete product</button>
+                                        </form>
+                                    </div>
+
+                                </article>
 
                             {% endfor %}
 
@@ -156,6 +240,17 @@
 
             </div>
 
+
+            <details class="manual-product-form">
+                <summary>Add product manually</summary>
+                <form method="post" action="{% url 'fridge-create' %}">
+                    {% csrf_token %}
+                    <label>Name<input name="name" maxlength="100" required></label>
+                    <label>Quantity<input name="quantity" type="number" min="1" max="10000" value="1" required></label>
+                    <label>Expires<input name="expire_date" type="date"></label>
+                    <button type="submit" class="product-action-button">Add product</button>
+                </form>
+            </details>
 
             <form
                 method="POST"
@@ -198,7 +293,7 @@
 
 <!-- Product modal -->
 
-<div id="productModal" class="product-modal">
+<template id="productModal">
 
     <div class="product-modal-card">
 
@@ -228,10 +323,11 @@
 
     </div>
 
-</div>
+</template>
 
 
 <script src="{% static 'js/smartfr.js' %}"></script>
+<script src="{% static 'js/expiry-notifications.js' %}"></script>
 
 </body>
 

@@ -369,6 +369,126 @@ input {
    Fridge
    ========================================================== */
 
+.expiry-reminders {
+    margin-bottom: 24px;
+    padding: 18px;
+
+    border: 1px solid rgba(210, 142, 38, 0.28);
+    border-radius: var(--radius-md);
+
+    background: rgba(255, 247, 229, 0.82);
+}
+
+.reminders-heading {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 13px;
+}
+
+.reminders-eyebrow {
+    color: #9b6529;
+
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.reminders-heading h2 {
+    margin: 4px 0 0;
+
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+}
+
+.enable-notifications {
+    padding: 8px 11px;
+
+    border: 1px solid rgba(155, 101, 41, 0.3);
+    border-radius: 999px;
+
+    background: var(--white);
+    color: #815321;
+
+    font-size: 0.72rem;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.reminders-list {
+    display: grid;
+
+    gap: 8px;
+}
+
+.expiry-reminder {
+    display: grid;
+
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+
+    padding: 11px;
+
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text-primary);
+    text-decoration: none;
+
+    transition: transform 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.expiry-reminder:hover {
+    transform: translateX(3px);
+
+    background: var(--white);
+}
+
+.reminder-icon {
+    display: grid;
+
+    width: 24px;
+    height: 24px;
+
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #b56f2f;
+    color: var(--white);
+
+    font-weight: 700;
+}
+
+.expiry-reminder strong,
+.expiry-reminder small {
+    display: block;
+}
+
+.expiry-reminder strong {
+    font-size: 0.78rem;
+}
+
+.expiry-reminder small {
+    margin-top: 3px;
+
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+}
+
+.reminder-link {
+    color: var(--accent-strong);
+
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
 .fridge {
     position: relative;
 
@@ -697,6 +817,8 @@ input {
 
 /* Open popup */
 
+.fridge-product:hover .product-details,
+.fridge-product:focus .product-details,
 .fridge-product.active .product-details {
     opacity: 1;
 
@@ -881,6 +1003,22 @@ input {
         gap: 16px;
     }
 
+    .reminders-heading {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .expiry-reminder {
+        grid-template-columns: auto minmax(0, 1fr);
+
+        align-items: flex-start;
+    }
+
+    .reminder-link {
+        grid-column: 2;
+    }
+
     .dashboard-header h1 {
         font-size: 2.5rem;
     }
@@ -915,6 +1053,10 @@ input {
         flex-direction: column;
     }
 
+    .manual-product-form form {
+        grid-template-columns: 1fr;
+    }
+
     .update-form .upload-box,
     .update-form .primary-button {
         width: 100%;
@@ -946,6 +1088,8 @@ input {
         z-index: 1000;
     }
 
+    .fridge-product:hover .product-details,
+    .fridge-product:focus .product-details,
     .fridge-product.active .product-details {
         transform: translate(-50%, 0) scale(1);
     }
@@ -1010,4 +1154,158 @@ input {
 
         transition-duration: 0.01ms !important;
     }
+}
+
+.details-title {
+    display: block;
+
+    margin-bottom: 13px;
+
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    line-height: 1.2;
+}
+
+.nutrition-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.nutrition-grid div {
+    padding: 7px;
+
+    border-radius: 8px;
+
+    background: var(--bg-soft);
+}
+
+.nutrition-grid span,
+.nutrition-note {
+    display: block;
+
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.05em;
+
+    color: var(--text-tertiary);
+}
+
+.nutrition-grid strong {
+    display: block;
+
+    margin-top: 3px;
+
+    font-size: 0.7rem;
+}
+
+.warning-row strong {
+    color: #9b6529;
+}
+
+.nutrition-note {
+    margin-top: 10px;
+
+    line-height: 1.4;
+}
+
+.product-action {
+    margin-top: 12px;
+}
+
+.edit-product-form {
+    display: grid;
+
+    gap: 7px;
+}
+
+.product-action label {
+    display: grid;
+
+    gap: 4px;
+
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+
+    color: var(--text-tertiary);
+}
+
+.product-action input,
+.manual-product-form input {
+    width: 100%;
+
+    padding: 7px 8px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    background: var(--white);
+    color: var(--text-primary);
+}
+
+.product-action-button {
+    width: 100%;
+
+    margin-top: 4px;
+    padding: 8px 10px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: var(--accent-strong);
+    color: var(--white);
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.delete-product-form {
+    margin-top: 7px;
+}
+
+.delete-button {
+    background: #b54848;
+}
+
+.manual-product-form {
+    margin-top: 20px;
+    padding: 14px 16px;
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+
+    background: rgba(255, 255, 255, 0.68);
+}
+
+.manual-product-form summary {
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+.manual-product-form form {
+    display: grid;
+
+    grid-template-columns: 2fr 1fr 1.4fr 1fr;
+    gap: 12px;
+
+    align-items: end;
+
+    margin-top: 14px;
+}
+
+.manual-product-form label {
+    display: grid;
+
+    gap: 5px;
+
+    font-size: 0.72rem;
+    font-weight: 600;
 }

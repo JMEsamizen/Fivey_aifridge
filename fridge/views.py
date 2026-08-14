@@ -1,15 +1,31 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
+from django.urls import reverse
 from django.utils import timezone
 from django.db import transaction
 from datetime import datetime
+from math import isfinite
 from PIL import Image, UnidentifiedImageError
 
-from .models import Fridge, Product
+from .models import ExpiryNotification, Fridge, Product
 from .additional_func import get_product_shape
-from fridge.ai_utils import analyze_media
+from fridge.ai_utils import analyze_media, AIServiceError
+from .services import create_expiry_notifications
 
 from django.contrib import messages
+
+
+def normalized_nutrition_value(value):
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return 0
+
+    return min(value, 100000) if isfinite(value) and value > 0 else 0
+
+
+def normalized_text(value, limit=300):
+    return str(value).strip()[:limit] if value else ""
 
 class FridgeCreateView(View):
 
@@ -72,6 +88,106 @@ class FridgeCreateView(View):
         return redirect("smart-fridge")
 
 
+class ProductUpdateView(View):
+
+    def post(self, request, product_id):
+        if not request.user.is_authenticated:
+            messages.info(request, "Sign in to analyze your fridge photo.")
+            return redirect(f"{reverse('login')}?next={request.path}")
+
+        product = get_object_or_404(
+            Product,
+            pk=product_id,
+            fridge__user=request.user,
+        )
+
+        name = request.POST.get("name", "").strip()
+        quantity = request.POST.get("quantity", "1")
+        expire_date = request.POST.get("expire_date", "")
+
+        if not name or len(name) > 100:
+            messages.error(request, "Product name must contain 1 to 100 characters")
+            return redirect("smart-fridge")
+
+        try:
+            quantity = int(quantity)
+        except (TypeError, ValueError):
+            messages.error(request, "Quantity must be a number")
+            return redirect("smart-fridge")
+
+        if not 1 <= quantity <= 10000:
+            messages.error(request, "Quantity must be between 1 and 10,000")
+            return redirect("smart-fridge")
+
+        parsed_expire_date = None
+        if expire_date:
+            try:
+                parsed_expire_date = datetime.strptime(expire_date, "%Y-%m-%d").date()
+            except ValueError:
+                messages.error(request, "Invalid expiration date")
+                return redirect("smart-fridge")
+
+            if parsed_expire_date < timezone.localdate():
+                messages.error(request, "Expiration date cannot be in the past")
+                return redirect("smart-fridge")
+
+        name_changed = product.name.casefold() != name.casefold()
+        expiry_changed = product.expire_date != parsed_expire_date
+        product.name = name
+        product.quantity = quantity
+        product.expire_date = parsed_expire_date
+        product.model_2d = get_product_shape(name)
+
+        if name_changed:
+            product.calories = 0
+            product.protein = 0
+            product.carbs = 0
+            product.fat = 0
+            product.benefits = ""
+            product.warnings = ""
+
+        product.save()
+        if name_changed or expiry_changed:
+            product.expiry_notifications.all().delete()
+        messages.success(request, "Product updated")
+        return redirect("smart-fridge")
+
+
+class ProductDeleteView(View):
+
+    def post(self, request, product_id):
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        product = get_object_or_404(
+            Product,
+            pk=product_id,
+            fridge__user=request.user,
+        )
+        product.expiry_notifications.all().delete()
+        product.delete()
+        messages.success(request, "Product deleted")
+        return redirect("smart-fridge")
+
+
+class ExpiryNotificationOpenView(View):
+
+    def get(self, request, notification_id):
+        if not request.user.is_authenticated:
+            return redirect("login")
+
+        notification = get_object_or_404(
+            ExpiryNotification,
+            pk=notification_id,
+            user=request.user,
+        )
+        if notification.read_at is None:
+            notification.read_at = timezone.now()
+            notification.save(update_fields=["read_at"])
+
+        return redirect(f"/recipes/suggestions/?product={notification.product_name}")
+
+
 class FridgesView(View):
 
     def get(self, request):
@@ -88,6 +204,7 @@ class FridgesView(View):
         fridge, created = Fridge.objects.get_or_create(
             user=request.user
         )
+        create_expiry_notifications()
 
         products = list(
             fridge.products.all()
@@ -105,7 +222,11 @@ class FridgesView(View):
                 "new_user": not products,
                 "products": products,
                 "shelves": shelves,
-                "fridge": fridge
+                "fridge": fridge,
+                "expiry_notifications": ExpiryNotification.objects.filter(
+                    user=request.user,
+                    read_at__isnull=True,
+                )[:5],
             }
         )
 
@@ -140,7 +261,11 @@ class FridgesView(View):
             messages.error(request, "The uploaded file is not a valid image")
             return redirect("smart-fridge")
 
-        products = analyze_media(file)
+        try:
+            products = analyze_media(file)
+        except AIServiceError as exc:
+            messages.error(request, f"AI could not analyze this image: {exc}")
+            return redirect("smart-fridge")
 
         if not isinstance(products, list):
             messages.error(request, "Could not analyze the image")
@@ -199,7 +324,13 @@ class FridgesView(View):
                 name=name,
                 quantity=quantity,
                 expire_date=parsed_expire_date,
-                model_2d=get_product_shape(name)
+                model_2d=get_product_shape(name),
+                calories=normalized_nutrition_value(product.get("calories")),
+                protein=normalized_nutrition_value(product.get("protein")),
+                carbs=normalized_nutrition_value(product.get("carbs")),
+                fat=normalized_nutrition_value(product.get("fat")),
+                benefits=normalized_text(product.get("benefits")),
+                warnings=normalized_text(product.get("warnings")),
             ))
 
         if not normalized_products:
@@ -207,6 +338,10 @@ class FridgesView(View):
             return redirect("smart-fridge")
 
         with transaction.atomic():
+            ExpiryNotification.objects.filter(
+                user=request.user,
+                product__fridge=fridge,
+            ).delete()
             fridge.products.all().delete()
             Product.objects.bulk_create(normalized_products)
 

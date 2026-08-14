@@ -1,12 +1,15 @@
 from io import BytesIO
+from datetime import timedelta
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.utils import timezone
 from PIL import Image
 
-from .models import Fridge, Product
+from .models import ExpiryNotification, Fridge, Product
+from .services import create_expiry_notifications
 
 
 class FridgeViewTests(TestCase):
@@ -38,5 +41,77 @@ class FridgeViewTests(TestCase):
         self.assertEqual(self.product.protein, 0)
         self.assertEqual(self.product.carbs, 0)
         self.assertEqual(self.product.fat, 0)
+
+    def test_user_can_add_edit_and_delete_own_product(self):
+        self.client.force_login(self.user)
+
+        response = self.client.post("/fridge/create/", {
+            "name": "Apple",
+            "quantity": 3,
+            "expire_date": "2026-12-31",
+        })
+        self.assertRedirects(response, "/fridge/smartfridge/")
+
+        apple = Product.objects.get(fridge=self.fridge, name="Apple")
+        response = self.client.post(f"/fridge/products/{apple.pk}/edit/", {
+            "name": "Green apple",
+            "quantity": 4,
+            "expire_date": "2026-12-30",
+        })
+        self.assertRedirects(response, "/fridge/smartfridge/")
+
+        apple.refresh_from_db()
+        self.assertEqual(apple.name, "Green apple")
+        self.assertEqual(apple.quantity, 4)
+
+        response = self.client.post(f"/fridge/products/{apple.pk}/delete/")
+        self.assertRedirects(response, "/fridge/smartfridge/")
+        self.assertFalse(Product.objects.filter(pk=apple.pk).exists())
+
+    def test_expiry_reminders_are_created_once_for_today_and_two_days(self):
+        Product.objects.create(
+            fridge=self.fridge,
+            name="Yogurt",
+            expire_date=timezone.localdate(),
+        )
+        Product.objects.create(
+            fridge=self.fridge,
+            name="Cheese",
+            expire_date=timezone.localdate() + timedelta(days=2),
+        )
+
+        create_expiry_notifications()
+        create_expiry_notifications()
+
+        self.assertEqual(ExpiryNotification.objects.count(), 2)
+        self.assertTrue(
+            ExpiryNotification.objects.filter(
+                notification_type=ExpiryNotification.TODAY,
+                product_name="Yogurt",
+            ).exists()
+        )
+        self.assertTrue(
+            ExpiryNotification.objects.filter(
+                notification_type=ExpiryNotification.TWO_DAYS,
+                product_name="Cheese",
+            ).exists()
+        )
+
+    def test_opening_expiry_reminder_marks_it_as_read(self):
+        reminder = ExpiryNotification.objects.create(
+            user=self.user,
+            product=self.product,
+            product_name=self.product.name,
+            expire_date=timezone.localdate(),
+            notification_type=ExpiryNotification.TODAY,
+            message="Use Milk today — it expires today.",
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(f"/fridge/notifications/{reminder.pk}/open/")
+
+        self.assertRedirects(response, "/recipes/suggestions/?product=Milk")
+        reminder.refresh_from_db()
+        self.assertIsNotNone(reminder.read_at)
 
 # Create your tests here.

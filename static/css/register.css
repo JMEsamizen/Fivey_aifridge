@@ -406,6 +406,42 @@ form {
    Create Account Button
    ========================================================== */
 
+.input-hint {
+    margin: 8px 0 0;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    color: var(--text-tertiary);
+}
+
+.auth-note {
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.secondary-action {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.secondary-action a {
+    font-size: 0.82rem;
+    color: var(--accent-strong);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s var(--ease);
+}
+
+.secondary-action a:hover {
+    color: var(--text-primary);
+}
+
+
 .primary-button {
     width: 100%;
 

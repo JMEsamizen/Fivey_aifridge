@@ -73,6 +73,8 @@ class Product(models.Model):
     protein = models.FloatField(default=0)
     carbs = models.FloatField(default=0)
     fat = models.FloatField(default=0)
+    benefits = models.TextField(blank=True, default="")
+    warnings = models.TextField(blank=True, default="")
 
     model_2d = models.CharField(
         max_length=255,
@@ -104,3 +106,33 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExpiryNotification(models.Model):
+    TWO_DAYS = "two_days"
+    TODAY = "today"
+    TYPE_CHOICES = [
+        (TWO_DAYS, "Expires in two days"),
+        (TODAY, "Expires today"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="expiry_notifications")
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name="expiry_notifications")
+    product_name = models.CharField(max_length=100)
+    expire_date = models.DateField()
+    notification_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    message = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "product", "expire_date", "notification_type"],
+                name="unique_product_expiry_notification",
+            )
+        ]
+
+    def __str__(self):
+        return self.message

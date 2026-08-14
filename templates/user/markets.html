@@ -1,19 +1,28 @@
 {% load static %}
+{% load i18n_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
     <title>Fivey | Markets</title>
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 <body>
+    {% include 'includes/language_switcher.html' %}
     <main class="hero">
         <div class="hero-content">
             <div class="eyebrow"><span class="status-dot"></span>FIVEY MARKETS</div>
-            <h1>Food markets,<br>coming soon.</h1>
-            <p class="hero-sub">We are preparing smart shopping suggestions based on your fridge inventory.</p>
-            <a class="btn btn-primary" href="{% url 'mainpage' %}">Back to home</a>
+            <h1>{% trans 'Food markets, coming soon.' %}</h1>
+            <p class="hero-sub">{% trans 'We are preparing smart shopping suggestions based on your fridge inventory.' %}</p>
+            <a class="btn btn-primary" href="{% url 'mainpage' %}">{% trans 'Back to home' %}</a>
         </div>
     </main>
 </body>

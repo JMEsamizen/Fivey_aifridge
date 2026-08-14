@@ -14,8 +14,8 @@ class Profile(models.Model):
         blank=True
     )
 
-    surname = models.CharField(
-        max_length=30,
+    full_name = models.CharField(
+        max_length=150,
         null=True,
         blank=True,
         validators=[

@@ -13,8 +13,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'site.webmanifest' %}">
 
-    <title>Fivey | Sign In</title>
-    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <title>Fivey | My Profile</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
 </head>
 
 <body>
@@ -33,52 +33,41 @@
 
             <div class="brand">
                 <h2>{% trans 'Fivey' %}</h2>
-                <p>{% trans 'AI-powered food & health platform' %}</p>
+                <p>{% trans 'Your profile' %}</p>
             </div>
 
             <div class="auth-header">
-                <h1>{% trans 'Sign In' %}</h1>
-                <p>{% trans 'Access your AI-powered food and health dashboard.' %}</p>
+                <h1>{{ user.username }}</h1>
+                <p>{{ user.email }}</p>
             </div>
 
-            {% if error %}
-            <div class="alert error">
-                {{ error }}
-            </div>
-            {% endif %}
-
-            {% if message %}
-            <div class="alert success">
-                {{ message }}
-            </div>
-            {% endif %}
-
-            <form method="POST">
+            <form action="{% url 'profile' %}" method="post">
 
                 {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.GET.next }}">
 
                 <div class="input-group">
-                    <label for="username">{% trans 'Username' %}</label>
-                    <input id="username" type="text" name="username" placeholder="{% trans 'Enter your username' %}" required>
+                    <label for="full-name">{% trans 'Full Name' %}</label>
+                    <input id="full-name" type="text" name="full_name" placeholder="John Doe"
+                        value="{{ profile.full_name|default:'' }}">
                 </div>
 
                 <div class="input-group">
-                    <label for="password">{% trans 'Password' %}</label>
-                    <input id="password" type="password" name="password" placeholder="{% trans 'Enter your password' %}" required>
+                    <label for="birth-date">{% trans 'Date of Birth' %}</label>
+                    <input id="birth-date" type="date" name="birth-date"
+                        value="{{ profile.birth_date|date:'Y-m-d'|default:'' }}">
+                    <p class="input-hint">
+                        {% trans "Add your birthday and we'll wish you a happy birthday on the day." %}
+                    </p>
                 </div>
 
                 <button type="submit" class="primary-button">
-                    {% trans 'Sign In' %}
+                    {% trans 'Save Changes' %}
                 </button>
 
             </form>
 
-            <div class="auth-footer">
-                <span>{% trans "Don't have an account?" %}</span>
-                <a href="{% url 'register' %}">
-                    {% trans 'Create one' %}
-                </a>
+            <div class="secondary-action">
+                <a href="{% url 'mainpage' %}">{% trans 'Back to Home' %}</a>
             </div>
 
         </div>

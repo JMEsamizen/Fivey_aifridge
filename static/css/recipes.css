@@ -1,0 +1,267 @@
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        /* Retseptlar setkasi */
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .recipe-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .recipe-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .recipe-ingredients {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .btn-view {
+            background-color: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-view:hover {
+            background-color: #219150;
+        }
+
+        /* Modal Stili */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* AI Ozuqaviy qiymatlar bo'limi */
+        .modal-nutrition {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-nutrition div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-nutrition strong {
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .modal-nutrition small {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        /* Foyda (What you gain) bo'limi */
+        .modal-benefits {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: #eef8f1;
+            border-left: 4px solid #27ae60;
+            border-radius: 6px;
+        }
+
+        .modal-benefits h4 {
+            margin: 0 0 8px;
+            font-size: 0.95rem;
+            color: #1f6f3e;
+        }
+
+        .modal-benefits ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .modal-benefits li {
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+
+        /* Loading spinner animatsiyasi */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* =============================================================
+           Responsive dizayn — tab / planshet / mobil moslashuvchan
+           ============================================================= */
+        .container {
+            padding: 0 16px;
+        }
+
+        .modal-content {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* O'rta ekranlar: planshetlar */
+        @media (max-width: 820px) {
+            body {
+                padding: 16px 0;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+                margin-bottom: 24px;
+                padding: 0 6px;
+            }
+
+            .recipes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 16px;
+            }
+        }
+
+        /* Kichik ekranlar: telefonlar */
+        @media (max-width: 560px) {
+            body {
+                padding: 10px 0;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            h1 {
+                font-size: 1.3rem;
+                margin-bottom: 20px;
+            }
+
+            .recipes-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .recipe-card {
+                padding: 16px;
+            }
+
+            .recipe-title {
+                font-size: 1.1rem;
+            }
+
+            .btn-view {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+
+            /* Modaldan to'liq ekran pastki varaq (bottom sheet) hosil qilish */
+            .modal {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            .modal-content {
+                width: 100%;
+                max-width: none;
+                border-radius: 18px 18px 0 0;
+                padding: 22px 18px 24px;
+                max-height: 88vh;
+            }
+
+            .modal-nutrition {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .modal-nutrition {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    

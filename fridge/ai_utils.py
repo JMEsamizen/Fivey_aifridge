@@ -1,8 +1,53 @@
 import requests
 import base64
 import json
+import re
 from datetime import datetime
 from getenv import API_KEY as AI_KEY
+
+
+class AIServiceError(Exception):
+    """Raised when the AI provider itself fails (network, auth, bad response)."""
+
+
+def _extract_json(content):
+    """Robustly parse the JSON array from the model's reply.
+
+    Models sometimes wrap the answer in Markdown code fences or add extra
+    prose around the JSON, so a plain ``json.loads`` is not enough. This
+    helper strips fences and falls back to the first ``[...]`` block.
+    """
+    if not content:
+        return []
+
+    text = str(content).strip()
+
+    # Remove Markdown code fences (```json ... ```) if present.
+    fenced = re.search(r"```(?:json)?\s*(.+?)```", text, re.DOTALL)
+    if fenced:
+        text = fenced.group(1).strip()
+
+    try:
+        data = json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        match = re.search(r"\[.*\]", text, re.DOTALL)
+        if not match:
+            return []
+        try:
+            data = json.loads(match.group(0))
+        except (json.JSONDecodeError, ValueError):
+            return []
+
+    if isinstance(data, list):
+        return data
+
+    # Some models return a wrapper object instead of a bare array.
+    if isinstance(data, dict):
+        for key in ("products", "items", "data", "results"):
+            if isinstance(data.get(key), list):
+                return data[key]
+
+    return []
 
 
 def analyze_media(file):
@@ -22,8 +67,11 @@ def analyze_media(file):
         },
 
         json={
-            "model": "openai/gpt-4o-mini",
-            "max_tokens": 700,
+            # NOTE: openai/gpt-4o-mini is text-only and cannot "see" images,
+            # which is why real fridge photos were never recognised. A
+            # vision-capable model is required to analyse photos.
+            "model": "google/gemini-2.5-flash",
+            "max_tokens": 12000,
 
             "messages": [
                 {
@@ -43,6 +91,12 @@ Each product MUST have:
 - "name": product name
 - "quantity": integer quantity
 - "expire_date": expiration date in YYYY-MM-DD format
+- "calories": estimated calories for one serving, as a number
+- "protein": estimated protein in grams for one serving, as a number
+- "carbs": estimated carbohydrates in grams for one serving, as a number
+- "fat": estimated fat in grams for one serving, as a number
+- "benefits": a short, plain-text description of nutritional benefits
+- "warnings": a short dietary warning, or an empty string when there is none
 
 Example:
 
@@ -50,7 +104,13 @@ Example:
     {
         "name": "Milk",
         "quantity": 2,
-        "expire_date": "2026-08-20"
+        "expire_date": "2026-08-20",
+        "calories": 61,
+        "protein": 3.2,
+        "carbs": 4.8,
+        "fat": 3.3,
+        "benefits": "Source of calcium and protein.",
+        "warnings": "Contains lactose."
     },
     {
         "name": "Eggs",
@@ -75,6 +135,9 @@ NEVER invent an expiration date.
 
 If quantity cannot be determined, use 1.
 
+Nutrition values are estimates. Never claim a medical benefit. Warnings must be
+short, factual and limited to common allergens or dietary considerations.
+
 If you are unsure about a product, still include it.
 """
                 },
@@ -97,14 +160,13 @@ If you are unsure about a product, still include it.
                 }
             ]
             },
-            timeout=(5, 45),
+            timeout=(5, 60),
         )
         response.raise_for_status()
         data = response.json()
         content = data["choices"][0]["message"]["content"]
-        products = json.loads(content)
-        if not isinstance(products, list):
-            return []
-        return products
-    except (requests.RequestException, KeyError, IndexError, TypeError, json.JSONDecodeError, ValueError):
-        return []
+        return _extract_json(content)
+    except requests.RequestException as exc:
+        raise AIServiceError(f"AI service request failed: {exc}") from exc
+    except (KeyError, IndexError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise AIServiceError(f"AI service returned an unexpected response: {exc}") from exc

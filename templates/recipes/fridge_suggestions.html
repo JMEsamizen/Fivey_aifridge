@@ -1,0 +1,39 @@
+{% load i18n_extras %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <title>Fivey | Recipe suggestions</title>
+    <link rel="stylesheet" href="{% static 'css/fridge_suggestions.css' %}">
+</head>
+<body>
+    {% include 'includes/language_switcher.html' %}
+    <main>
+        <a class="back" href="{% url 'smart-fridge' %}">&larr; Back to my fridge</a>
+        <h1>{% trans 'Recipe Suggestions' %}</h1>
+        {% if focus_product %}
+            <p class="lead">Suggestions containing <strong>{{ focus_product }}</strong>, prioritised by ingredients already in your fridge.</p>
+        {% else %}
+            <p class="lead">Suggestions are matched to products currently in your fridge.</p>
+        {% endif %}
+
+        {% for suggestion in suggestions %}
+            <article class="recipe">
+                <h2>{{ suggestion.recipe.title }}</h2>
+                <span class="match">You have: {{ suggestion.matched_products|join:', ' }}</span>
+                <p>{{ suggestion.recipe.ingredients }}</p>
+                <a href="{% url 'recipes' %}">View recipe details and nutrition</a>
+            </article>
+        {% empty %}
+            <p>No matching recipes yet. Add recipes containing your refrigerator products to see suggestions here.</p>
+        {% endfor %}
+    </main>
+</body>
+</html>

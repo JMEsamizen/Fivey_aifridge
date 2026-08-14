@@ -1,9 +1,17 @@
 {% load static %}
+{% load i18n_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+
     <title>Fivey - Smart Food Intelligence</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +23,8 @@
 
 <body>
 
+{% include 'includes/language_switcher.html' %}
+
 <header class="navbar" id="navbar">
     <div class="nav-inner">
 
@@ -23,9 +33,9 @@
         </a>
 
         <nav class="nav-links">
-            <a href="{% url 'mainpage' %}">Home</a>
-            <a href="{% url 'smart-fridge' %}">Smart Fridge</a>
-            <a href="{% url 'markets' %}">Markets</a>
+            <a href="{% url 'mainpage' %}">{% trans 'Home' %}</a>
+            <a href="{% url 'smart-fridge' %}">{% trans 'Smart Fridge' %}</a>
+            <a href="{% url 'markets' %}">{% trans 'Markets' %}</a>
         </nav>
 
         <div class="nav-actions">
@@ -35,21 +45,23 @@
                 {{ user.username }}
             </span>
 
+            <a class="nav-login" href="{% url 'profile' %}">{% trans 'Profile' %}</a>
+
             <form action="{% url 'logout' %}" method="post" class="logout-form">
                 {% csrf_token %}
                 <button class="logout-btn" type="submit">
-                    Logout
+                    {% trans 'Logout' %}
                 </button>
             </form>
 
             {% else %}
 
             <a class="nav-login" href="{% url 'login' %}">
-                Login
+                {% trans 'Login' %}
             </a>
 
             <a class="nav-signup" href="{% url 'register' %}">
-                Sign Up
+                {% trans 'Sign Up' %}
             </a>
 
             {% endif %}
@@ -61,19 +73,20 @@
     </div>
 
     <div class="nav-mobile" id="navMobile">
-        <a href="{% url 'mainpage' %}">Home</a>
-        <a href="{% url 'smart-fridge' %}">Smart Fridge</a>
-        <a href="{% url 'markets' %}">Markets</a>
+        <a href="{% url 'mainpage' %}">{% trans 'Home' %}</a>
+        <a href="{% url 'smart-fridge' %}">{% trans 'Smart Fridge' %}</a>
+        <a href="{% url 'markets' %}">{% trans 'Markets' %}</a>
         <div class="nav-mobile-actions">
             {% if user.is_authenticated %}
             <span class="nav-user">{{ user.username }}</span>
+            <a class="nav-login" href="{% url 'profile' %}">{% trans 'Profile' %}</a>
             <form action="{% url 'logout' %}" method="post">
                 {% csrf_token %}
-                <button class="logout-btn" type="submit">Logout</button>
+                <button class="logout-btn" type="submit">{% trans 'Logout' %}</button>
             </form>
             {% else %}
-            <a class="nav-login" href="{% url 'login' %}">Login</a>
-            <a class="nav-signup" href="{% url 'register' %}">Sign Up</a>
+            <a class="nav-login" href="{% url 'login' %}">{% trans 'Login' %}</a>
+            <a class="nav-signup" href="{% url 'register' %}">{% trans 'Sign Up' %}</a>
             {% endif %}
         </div>
     </div>
@@ -81,19 +94,46 @@
 
 <main>
 
+{% if messages %}
+<div class="flash-messages">
+    {% for message in messages %}
+        <div class="flash {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if user.is_authenticated and not profile.birth_date %}
+<div class="announce-banner">
+    <span class="announce-icon">🎂</span>
+    <p>
+        <strong>{% trans 'Make it personal!' %}</strong>
+        {% trans "Add your date of birth on your profile page and we'll remember to wish you a happy birthday." %}
+    </p>
+    <a class="announce-btn" href="{% url 'profile' %}">{% trans 'Add birthday' %}</a>
+</div>
+{% elif user.is_authenticated and is_birthday %}
+<div class="announce-banner celebrate">
+    <span class="announce-icon">🎉</span>
+    <p>
+        <strong>Happy birthday, {{ user.first_name|default:user.username }}!</strong>
+        We hope you have a wonderful day.
+    </p>
+</div>
+{% endif %}
+
 <section class="hero">
 
     <div class="hero-content">
 
         <div class="eyebrow reveal-up" style="--d:0">
             <span class="status-dot"></span>
-            AI&#8209;POWERED SMART FRIDGE
+            {% trans 'AI-POWERED SMART FRIDGE' %}
         </div>
 
         <h1 class="reveal-up" style="--d:1">
-            Your fridge.
+            {% trans 'Your fridge.' %}
             <br>
-            Smarter than ever.
+            {% trans 'Smarter than ever.' %}
         </h1>
 
         <p class="hero-sub reveal-up" style="--d:2">
@@ -104,12 +144,18 @@
 
         <div class="hero-buttons reveal-up" style="--d:3">
 
-            <a href="{% url 'register' %}" class="btn btn-primary">
-                Get Started
-            </a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'smart-fridge' %}" class="btn btn-primary">
+                    {% trans 'Get Started' %}
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary">
+                    {% trans 'Get Started' %}
+                </a>
+            {% endif %}
 
             <a href="{% url 'smart-fridge' %}" class="btn btn-secondary">
-                Create Your Smart Fridge
+                {% trans 'Create Your Smart Fridge' %}
             </a>
 
         </div>
@@ -353,15 +399,21 @@
 
 <section class="final-cta reveal-on-scroll">
 
-    <h2>Ready to make your fridge smarter?</h2>
-    <p>Turn your refrigerator into an intelligent food inventory.</p>
+    <h2>{% trans 'Ready to make your fridge smarter?' %}</h2>
+    <p>{% trans 'Turn your refrigerator into an intelligent food inventory.' %}</p>
 
     <div class="hero-buttons">
-        <a href="{% url 'register' %}" class="btn btn-primary">
-            Get Started
-        </a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'smart-fridge' %}" class="btn btn-primary">
+                {% trans 'Get Started' %}
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary">
+                {% trans 'Get Started' %}
+            </a>
+        {% endif %}
         <a href="{% url 'smart-fridge' %}" class="btn btn-secondary">
-            Create Smart Fridge
+            {% trans 'Create Your Smart Fridge' %}
         </a>
     </div>
 

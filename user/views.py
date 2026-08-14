@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from datetime import datetime
 from django.contrib import messages
 
@@ -12,7 +14,25 @@ from .models import Profile
 class Mainpageview(View):
 
     def get(self, request):
-        return render(request, "mainpage.html")
+        context = {}
+
+        if request.user.is_authenticated:
+            try:
+                profile = Profile.objects.get(user=request.user)
+            except Profile.DoesNotExist:
+                profile = None
+
+            context["profile"] = profile
+
+            if profile and profile.birth_date:
+                today = timezone.localdate()
+                if (today.month, today.day) == (
+                    profile.birth_date.month,
+                    profile.birth_date.day,
+                ):
+                    context["is_birthday"] = True
+
+        return render(request, "mainpage.html", context)
 
 
 class MarketsView(View):
@@ -28,32 +48,22 @@ class RegisterView(View):
 
     def post(self, request):
 
-        name = request.POST.get("name", "").strip()
-        surname = request.POST.get("surname", "").strip()
-        birth_date = request.POST.get("birth-date", "").strip()
+        full_name = request.POST.get("full_name", "").strip()
         username = request.POST.get("username", "").strip()
         email = request.POST.get("email", "").strip().lower()
         password = request.POST.get("password", "")
         re_password = request.POST.get("re-password", "")
 
-        if not name:
-            messages.error(request, "First name is required")
+        if not full_name:
+            messages.error(request, "Full name is required")
             return redirect("register")
 
-        if len(name) < 2:
-            messages.error(request, "First name must contain at least 2 characters")
+        if len(full_name) < 2:
+            messages.error(request, "Full name must contain at least 2 characters")
             return redirect("register")
 
-        if len(name) > 150:
-            messages.error(request, "First name is too long")
-            return redirect("register")
-
-        if surname and len(surname) < 2:
-            messages.error(request, "Last name must contain at least 2 characters")
-            return redirect("register")
-
-        if len(surname) > 30:
-            messages.error(request, "Last name is too long")
+        if len(full_name) > 150:
+            messages.error(request, "Full name is too long")
             return redirect("register")
 
         if not username:
@@ -106,44 +116,83 @@ class RegisterView(View):
             messages.error(request, "Passwords do not match")
             return redirect("register")
 
-        parsed_birth_date = None
-
-        if birth_date:
-            try:
-                parsed_birth_date = datetime.strptime(
-                    birth_date,
-                    "%Y-%m-%d"
-                ).date()
-            except ValueError:
-                messages.error(request, "Invalid birth date")
-                return redirect("register")
-
-            if parsed_birth_date > timezone.localdate():
-                messages.error(
-                    request,
-                    "Birth date cannot be in the future"
-                )
-                return redirect("register")
-
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
 
-        user.first_name = name
-        user.last_name = surname
+        user.first_name = full_name
         user.save()
 
         Profile.objects.create(
             user=user,
-            birth_date=parsed_birth_date,
-            surname=surname or None
+            full_name=full_name
         )
 
         login(request, user)
 
+        messages.success(
+            request,
+            f"Welcome to Fivey, {full_name}! "
+            "Add your date of birth on your profile page and we'll "
+            "remember to celebrate your birthday with you.",
+        )
+
         return redirect("mainpage")
+
+
+class ProfileView(LoginRequiredMixin, View):
+
+    def get(self, request):
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+        return render(request, "user/profile.html", {"profile": profile})
+
+    def post(self, request):
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+
+        full_name = request.POST.get("full_name", "").strip()
+        birth_date = request.POST.get("birth-date", "").strip()
+
+        if full_name and len(full_name) < 2:
+            messages.error(
+                request,
+                "Full name must contain at least 2 characters",
+            )
+            return redirect("profile")
+
+        if len(full_name) > 150:
+            messages.error(request, "Full name is too long")
+            return redirect("profile")
+
+        parsed_birth_date = None
+
+        if birth_date:
+            try:
+                parsed_birth_date = datetime.strptime(
+                    birth_date,
+                    "%Y-%m-%d",
+                ).date()
+            except ValueError:
+                messages.error(request, "Invalid birth date")
+                return redirect("profile")
+
+            if parsed_birth_date > timezone.localdate():
+                messages.error(
+                    request,
+                    "Birth date cannot be in the future",
+                )
+                return redirect("profile")
+
+        profile.user.first_name = full_name or request.user.username
+        profile.user.save()
+
+        profile.full_name = full_name or None
+        profile.birth_date = parsed_birth_date
+        profile.save()
+
+        messages.success(request, "Profile updated successfully")
+        return redirect("profile")
 
 
 class LoginView(View):
@@ -155,6 +204,7 @@ class LoginView(View):
 
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "")
+        next_url = request.POST.get("next", "")
 
         if not username:
             messages.error(request, "Username is required")
@@ -175,6 +225,32 @@ class LoginView(View):
             return redirect("login")
 
         login(request, user)
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+
+        if profile.birth_date:
+            today = timezone.localdate()
+            if (today.month, today.day) == (
+                profile.birth_date.month,
+                profile.birth_date.day,
+            ):
+                messages.success(
+                    request,
+                    f"Happy birthday, {user.first_name or user.username}! "
+                    "Wishing you a wonderful day from all of us at Fivey.",
+                )
+        else:
+            messages.info(
+                request,
+                "Add your date of birth on your profile page so we can "
+                "wish you a happy birthday each year.",
+            )
+        if url_has_allowed_host_and_scheme(
+            next_url,
+            allowed_hosts={request.get_host()},
+            require_https=request.is_secure(),
+        ):
+            return redirect(next_url)
 
         return redirect("mainpage")
 

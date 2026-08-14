@@ -1,29 +1,27 @@
-function showProduct(product) {
-    const name = product.dataset.name;
-    const quantity = product.dataset.quantity;
-    const expireDate = product.dataset.expire;
+const products = document.querySelectorAll(".fridge-product");
 
-    document.getElementById("modalProductName").textContent = name;
+products.forEach((product) => {
+    product.addEventListener("click", (event) => {
+        if (event.target.closest(".product-action")) {
+            event.stopPropagation();
+            return;
+        }
 
-    document.getElementById("modalQuantity").textContent =
-        "×" + quantity;
+        event.stopPropagation();
+        const wasOpen = product.classList.contains("active");
 
-    document.getElementById("modalExpireDate").textContent =
-        expireDate || "Not available";
+        products.forEach((item) => item.classList.remove("active"));
+        if (!wasOpen) product.classList.add("active");
+    });
 
-    document.getElementById("productModal").classList.add("active");
-}
+    product.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            product.click();
+        }
+    });
+});
 
-
-function closeProduct() {
-    document.getElementById("productModal").classList.remove("active");
-}
-
-
-document.addEventListener("click", function (event) {
-    const modal = document.getElementById("productModal");
-
-    if (event.target === modal) {
-        closeProduct();
-    }
+document.addEventListener("click", () => {
+    products.forEach((product) => product.classList.remove("active"));
 });
