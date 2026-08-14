@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fivey - Smart Food Intelligence</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="logo">
+        Fivey
+    </div>
+
+    <div class="nav-actions">
+        {% if user.is_authenticated %}
+
+        <span>
+            {{ user.username }}
+        </span>
+
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button class="logout-btn">
+                Logout
+            </button>
+        </form>
+
+        {% else %}
+
+        <a href="{% url 'login' %}">
+            Login
+        </a>
+
+        <a class="nav-signup" href="{% url 'register' %}">
+            Sign Up
+        </a>
+
+        {% endif %}
+    </div>
+</header>
+
+<main>
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Your food.
+            <br>
+            Smarter with AI.
+        </h1>
+
+        <p>
+            Fivey transforms your fridge into an intelligent
+            food assistant. Scan products, reduce waste,
+            and get personalized recommendations.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{% url 'register' %}" class="primary-btn">
+                Get Started
+            </a>
+
+            <a href="{% url 'smart-fridge' %}" class="create-btn">
+                Create Fridge
+            </a>
+
+        </div>
+
+        <div class="trust">
+            Trusted AI-powered food management
+        </div>
+
+    </div>
+
+
+    <div class="hero-card">
+
+        <div class="fridge-preview">
+
+            <div class="preview-header">
+                Smart Fridge
+            </div>
+
+            <div class="product">
+                Milk
+                <span>Fresh</span>
+            </div>
+
+            <div class="product">
+                Vegetables
+                <span>Healthy</span>
+            </div>
+
+            <div class="product">
+                Eggs
+                <span>Available</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="features">
+
+    <div class="feature">
+
+        <h3>
+            AI Recognition
+        </h3>
+
+        <p>
+            Identify products instantly from images.
+        </p>
+
+    </div>
+
+
+    <div class="feature">
+
+        <h3>
+            Smart Recipes
+        </h3>
+
+        <p>
+            Generate meals using your ingredients.
+        </p>
+
+    </div>
+
+
+    <div class="feature">
+
+        <h3>
+            Health Insights
+        </h3>
+
+        <p>
+            Understand your nutrition better.
+        </p>
+
+    </div>
+
+</section>
+
+</main>
+
+<script src="{% static 'js/home.js' %}"></script>
+
+</body>
+</html>
